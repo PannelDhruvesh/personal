@@ -25,6 +25,6 @@ class File(Base):
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime(timezone=True))
     sort_order = Column(Integer, default=0)
-    metadata = Column(JSONB, default={})
+    file_metadata = Column("metadata", JSONB, default={})
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

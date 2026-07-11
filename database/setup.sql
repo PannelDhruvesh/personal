@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS files (
     is_deleted        BOOLEAN      DEFAULT FALSE,
     deleted_at        TIMESTAMPTZ,
     sort_order        INTEGER      DEFAULT 0,
-    metadata          JSONB        DEFAULT '{}',
+    file_metadata     JSONB        DEFAULT '{}',
     created_at        TIMESTAMPTZ  DEFAULT NOW(),
     updated_at        TIMESTAMPTZ  DEFAULT NOW(),
     CONSTRAINT files_size_check CHECK (file_size > 0)
