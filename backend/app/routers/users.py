@@ -23,6 +23,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
         "avatar_url": current_user.avatar_url,
         "bio": current_user.bio,
         "is_verified": current_user.is_verified,
+        "is_admin": current_user.is_admin,
         "storage_used": current_user.storage_used,
         "storage_limit": current_user.storage_limit,
         "storage_percent": round((current_user.storage_used / current_user.storage_limit) * 100, 2) if current_user.storage_limit else 0,

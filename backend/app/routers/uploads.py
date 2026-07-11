@@ -8,6 +8,7 @@ from app.services.upload_service import process_and_upload_file, get_file_by_id,
 from app.services.storage import generate_signed_url
 from app.utils.validator import validate_file_upload
 from app.utils.response import success_response
+from app.routers.admin import _log_activity
 import uuid
 
 router = APIRouter(prefix="/uploads", tags=["Uploads"])
@@ -45,6 +46,8 @@ async def upload_file(
 
     db_file = await process_and_upload_file(db, current_user.id, parsed_album_id, file, file_type)
     signed_url = generate_signed_url(db_file.storage_path)
+    _log_activity(db, current_user.id, "upload", "file", db_file.id,
+                  {"filename": db_file.original_filename, "size": db_file.file_size, "type": file_type})
     return success_response(data=serialize_file(db_file, signed_url), status_code=201)
 
 
@@ -104,9 +107,13 @@ async def delete_file(
         await delete_file_from_storage(file.storage_path)
         db.delete(file)
         db.commit()
+        _log_activity(db, current_user.id, "delete_permanent", "file", file_id,
+                      {"filename": file.original_filename})
         return success_response(message="File permanently deleted")
 
     soft_delete_file(db, file)
+    _log_activity(db, current_user.id, "delete", "file", file_id,
+                  {"filename": file.original_filename})
     return success_response(message="File moved to trash")
 
 

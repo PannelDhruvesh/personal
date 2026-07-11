@@ -39,6 +39,22 @@ export function redirectIfAuth() {
 }
 
 /**
+ * Require admin role. Redirect to dashboard if not admin.
+ */
+export function requireAdmin() {
+  if (!isLoggedIn()) {
+    window.location.replace('/login.html');
+    return false;
+  }
+  const user = getUser();
+  if (!user?.is_admin) {
+    window.location.replace('/dashboard.html');
+    return false;
+  }
+  return true;
+}
+
+/**
  * Full logout: revoke token, clear storage, redirect.
  */
 export async function logout() {

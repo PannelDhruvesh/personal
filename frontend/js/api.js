@@ -160,6 +160,17 @@ class ApiClient {
   // ── Settings ──
   getStorageUsage()        { return this.get('/settings/storage-usage'); }
   emptyTrash()             { return this.delete('/settings/trash/empty'); }
+
+  // ── Admin ──
+  adminGetStats()                          { return this.get('/admin/stats'); }
+  adminGetUsers(params)                    { return this.get('/admin/users', params); }
+  adminGetUser(id)                         { return this.get(`/admin/users/${id}`); }
+  adminSetUserStatus(id, is_active)        { return this.request(`/admin/users/${id}/status?is_active=${is_active}`, { method: 'PATCH' }); }
+  adminToggleAdmin(id, is_admin)           { return this.request(`/admin/users/${id}/admin?is_admin=${is_admin}`, { method: 'PATCH' }); }
+  adminDeleteUser(id)                      { return this.delete(`/admin/users/${id}`); }
+  adminSetStorageLimit(id, limit_gb)       { return this.request(`/admin/users/${id}/storage-limit?limit_gb=${limit_gb}`, { method: 'PATCH' }); }
+  adminGetActivity(params)                 { return this.get('/admin/activity', params); }
+  adminGetFiles(params)                    { return this.get('/admin/files', params); }
 }
 
 class ApiError extends Error {

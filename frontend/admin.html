@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Admin — Its Billi ❤️</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div id="app" class="app-container admin-app">
+
+    <!-- ── Mobile top bar ───────────────────────────────── -->
+    <header class="admin-topbar" id="admin-topbar">
+      <span class="topbar-title">⚙️ Admin</span>
+      <span id="admin-user-name" style="font-size:var(--text-sm);color:var(--dark-subtext);"></span>
+    </header>
+
+    <div class="admin-layout">
+
+      <!-- ── Sidebar ──────────────────────────────────────── -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-logo">
+          <div class="admin-logo-title">Its Billi ❤️</div>
+          <div class="admin-logo-sub">Admin Panel</div>
+        </div>
+
+        <nav class="admin-nav">
+          <a class="admin-nav-item active" data-section="overview">
+            <span class="admin-nav-icon">📊</span>
+            <span class="admin-nav-label">Overview</span>
+          </a>
+          <a class="admin-nav-item" data-section="users">
+            <span class="admin-nav-icon">👥</span>
+            <span class="admin-nav-label">Users</span>
+          </a>
+          <a class="admin-nav-item" data-section="activity">
+            <span class="admin-nav-icon">📋</span>
+            <span class="admin-nav-label">Activity</span>
+          </a>
+          <a class="admin-nav-item" data-section="files">
+            <span class="admin-nav-icon">🗂️</span>
+            <span class="admin-nav-label">Files</span>
+          </a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+          <a href="/dashboard.html" class="admin-nav-item" style="margin-bottom:4px;">
+            <span class="admin-nav-icon">🏠</span>
+            <span class="admin-nav-label">Back to App</span>
+          </a>
+          <button class="admin-nav-item" id="admin-logout-btn" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;">
+            <span class="admin-nav-icon">🚪</span>
+            <span class="admin-nav-label">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ── Main content ──────────────────────────────────── -->
+      <main class="admin-main page-enter">
+
+        <!-- ── Overview ──────────────────────────────── -->
+        <section id="section-overview" class="admin-section active">
+          <div class="admin-page-title">Overview</div>
+
+          <!-- Users stats -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <span class="admin-card-title">👥 Users</span>
+            </div>
+            <div class="admin-card-body">
+              <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Total</div>
+                  <div class="admin-stat-value" id="stat-total-users">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Active</div>
+                  <div class="admin-stat-value" id="stat-active-users">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">New (7d)</div>
+                  <div class="admin-stat-value" id="stat-new-week">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Albums</div>
+                  <div class="admin-stat-value" id="stat-albums">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Files stats -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <span class="admin-card-title">🗂️ Files & Storage</span>
+            </div>
+            <div class="admin-card-body">
+              <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Total Files</div>
+                  <div class="admin-stat-value" id="stat-total-files">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Photos</div>
+                  <div class="admin-stat-value" id="stat-photos">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Videos</div>
+                  <div class="admin-stat-value" id="stat-videos">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Uploads (7d)</div>
+                  <div class="admin-stat-value" id="stat-uploads-week">—</div>
+                </div>
+              </div>
+              <div class="admin-stats-grid" style="margin-top:0">
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">In Trash</div>
+                  <div class="admin-stat-value" id="stat-trash">—</div>
+                </div>
+                <div class="admin-stat-card">
+                  <div class="admin-stat-label">Total Storage</div>
+                  <div class="admin-stat-value" id="stat-storage" style="font-size:var(--text-lg);">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Users ───────────────────────────────────── -->
+        <section id="section-users" class="admin-section">
+          <div class="admin-page-title">Users</div>
+
+          <div class="admin-search">
+            <input id="users-search" class="admin-search-input" type="search" placeholder="Search by name, email, username…" />
+            <select id="users-filter" class="admin-filter-select">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Suspended</option>
+              <option value="unverified">Unverified</option>
+            </select>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-body" style="padding:0 var(--space-5);">
+              <div id="users-list">
+                <div class="admin-loading">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-pagination">
+            <button id="users-prev" class="admin-btn admin-btn-ghost" disabled>← Prev</button>
+            <span id="users-page-info" class="admin-page-info">—</span>
+            <button id="users-next" class="admin-btn admin-btn-ghost">Next →</button>
+          </div>
+        </section>
+
+        <!-- ── Activity ────────────────────────────────── -->
+        <section id="section-activity" class="admin-section">
+          <div class="admin-page-title">Activity Log</div>
+
+          <div class="admin-search">
+            <input id="activity-user-filter" class="admin-search-input" type="text" placeholder="Filter by user ID…" style="max-width:200px;" />
+            <select id="activity-action-filter" class="admin-filter-select">
+              <option value="">All actions</option>
+              <option value="login">Login</option>
+              <option value="upload">Upload</option>
+              <option value="delete">Delete</option>
+              <option value="delete_permanent">Permanent delete</option>
+              <option value="admin">Admin actions</option>
+            </select>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-body" style="padding:0 var(--space-5);">
+              <div id="activity-list">
+                <div class="admin-loading">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-pagination">
+            <button id="activity-prev" class="admin-btn admin-btn-ghost" disabled>← Prev</button>
+            <span id="activity-page-info" class="admin-page-info">—</span>
+            <button id="activity-next" class="admin-btn admin-btn-ghost">Next →</button>
+          </div>
+        </section>
+
+        <!-- ── Files ───────────────────────────────────── -->
+        <section id="section-files" class="admin-section">
+          <div class="admin-page-title">All Files</div>
+
+          <div class="admin-card">
+            <div class="admin-card-body" style="padding:0 var(--space-5);">
+              <div id="files-list">
+                <div class="admin-loading">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-pagination">
+            <button id="files-prev" class="admin-btn admin-btn-ghost" disabled>← Prev</button>
+            <span id="files-page-info" class="admin-page-info">—</span>
+            <button id="files-next" class="admin-btn admin-btn-ghost">Next →</button>
+          </div>
+        </section>
+
+      </main>
+    </div><!-- end admin-layout -->
+
+    <!-- ── User detail modal ──────────────────────────── -->
+    <div id="user-modal-overlay" class="admin-modal-overlay">
+      <div class="admin-modal">
+        <div class="admin-modal-header">
+          <span class="admin-modal-title">User Details</span>
+          <button class="admin-modal-close" id="modal-close-btn">✕</button>
+        </div>
+        <div id="modal-body">
+          <div class="admin-loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end app -->
+
+  <script src="config.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

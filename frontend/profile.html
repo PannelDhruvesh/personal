@@ -85,6 +85,12 @@
           <div class="menu-item-content"><div class="menu-item-label">Settings</div><div class="menu-item-sub">App preferences</div></div>
           <span class="menu-item-arrow">›</span>
         </a>
+        <!-- Admin panel link — shown only if user is admin (injected by profile.js) -->
+        <a href="/admin.html" class="menu-item" id="admin-panel-link" style="display:none;">
+          <div class="menu-item-icon" style="background:rgba(233,30,140,0.12);">🛡️</div>
+          <div class="menu-item-content"><div class="menu-item-label" style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Admin Panel</div><div class="menu-item-sub">Manage users &amp; activity</div></div>
+          <span class="menu-item-arrow">›</span>
+        </a>
         <div class="menu-item" id="logout-btn" style="cursor:pointer;">
           <div class="menu-item-icon red">🚪</div>
           <div class="menu-item-content"><div class="menu-item-label" style="color:#ff6b8a;">Sign Out</div></div>

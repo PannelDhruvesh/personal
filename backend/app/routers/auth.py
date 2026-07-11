@@ -159,6 +159,17 @@ async def login(data: LoginRequest, db: Session = Depends(get_db)):
     )
     db.commit()
 
+    # Log login activity
+    try:
+        db.execute(
+            """INSERT INTO activity_logs (user_id, action, resource_type, details)
+               VALUES (:uid, 'login', 'session', :details)""",
+            {"uid": str(user.id), "details": {"email": user.email}}
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return success_response(data={
         "access_token": access_token,
         "refresh_token": refresh_token,

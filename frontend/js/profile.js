@@ -50,6 +50,10 @@ function renderProfile(u) {
   if (storageEl) {
     storageEl.textContent = `${formatBytes(u.storage_used)} / ${formatBytes(u.storage_limit)}`;
   }
+
+  // Show admin panel link only for admins
+  const adminLink = document.getElementById('admin-panel-link');
+  if (adminLink) adminLink.style.display = u.is_admin ? 'flex' : 'none';
 }
 
 async function loadStats() {

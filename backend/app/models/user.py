@@ -17,6 +17,7 @@ class User(Base):
     bio = Column(Text)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
     storage_used = Column(BigInteger, default=0)
     storage_limit = Column(BigInteger, default=10737418240)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
