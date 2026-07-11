@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -14,19 +15,6 @@ async def get_storage_usage(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    photo_size = db.query(File).filter(
-        File.user_id == current_user.id,
-        File.file_type == "photo",
-        File.is_deleted == False
-    ).with_entities(
-        db.query(File.file_size).filter(
-            File.user_id == current_user.id,
-            File.file_type == "photo",
-            File.is_deleted == False
-        ).statement
-    )
-
-    from sqlalchemy import func
     photo_stats = db.query(
         func.count(File.id).label("count"),
         func.coalesce(func.sum(File.file_size), 0).label("size")
