@@ -3,5 +3,5 @@
 // which is consumed by api.js.
 // In production, replace API_URL with your Render backend URL.
 window.APP_CONFIG = {
-  API_URL: 'https://personal-dwjo.onrender.com/api/v1',
+  API_URL: 'https://personal-awj6.onrender.com/api/v1',
 };
