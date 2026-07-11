@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: its-billi-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SUPABASE_BUCKET
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: JWT_REFRESH_TOKEN_EXPIRE_DAYS
+        value: "30"
+      - key: APP_NAME
+        value: Its Billi
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: MAX_UPLOAD_SIZE_MB
+        value: "100"
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
