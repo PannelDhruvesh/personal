@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, text
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 import uuid
@@ -166,11 +166,11 @@ async def get_user_detail(
 
     # Recent activity
     raw_logs = db.execute(
-        """SELECT al.*, u.username, u.display_name
+        text("""SELECT al.*, u.username, u.display_name
            FROM activity_logs al
            JOIN users u ON al.user_id = u.id
            WHERE al.user_id = :uid
-           ORDER BY al.created_at DESC LIMIT 20""",
+           ORDER BY al.created_at DESC LIMIT 20"""),
         {"uid": str(user_id)}
     ).fetchall()
 
@@ -305,17 +305,17 @@ async def get_activity_logs(
         params["action"] = f"%{action}%"
 
     count_row = db.execute(
-        f"SELECT COUNT(*) FROM activity_logs al WHERE 1=1 {filters}",
+        text(f"SELECT COUNT(*) FROM activity_logs al WHERE 1=1 {filters}"),
         params
     ).scalar()
 
     rows = db.execute(
-        f"""SELECT al.*, u.username, u.display_name
+        text(f"""SELECT al.*, u.username, u.display_name
             FROM activity_logs al
             JOIN users u ON al.user_id = u.id
             WHERE 1=1 {filters}
             ORDER BY al.created_at DESC
-            LIMIT :limit OFFSET :offset""",
+            LIMIT :limit OFFSET :offset"""),
         params
     ).fetchall()
 
@@ -373,16 +373,16 @@ def _log_activity(db: Session, user_id, action: str,
                   resource_type: str = None, resource_id=None, details: dict = None):
     try:
         db.execute(
-            """INSERT INTO activity_logs (user_id, action, resource_type, resource_id, details)
-               VALUES (:uid, :action, :rtype, :rid, :details)""",
+            text("""INSERT INTO activity_logs (user_id, action, resource_type, resource_id, details)
+               VALUES (:uid, :action, :rtype, :rid, :details)"""),
             {
                 "uid": str(user_id),
                 "action": action,
                 "rtype": resource_type,
                 "rid": str(resource_id) if resource_id else None,
-                "details": details or {}
+                "details": str(details or {}).replace("'", '"')
             }
         )
         db.commit()
     except Exception:
-        pass  # Never let logging break the main flow
+        pass

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -89,7 +90,7 @@ async def get_settings(
     current_user: User = Depends(get_current_user)
 ):
     result = db.execute(
-        "SELECT * FROM user_settings WHERE user_id = :uid",
+        text("SELECT * FROM user_settings WHERE user_id = :uid"),
         {"uid": str(current_user.id)}
     ).fetchone()
 
@@ -128,7 +129,7 @@ async def update_settings(
     set_clause = ", ".join([f"{k} = :{k}" for k in update_fields.keys()])
     update_fields["uid"] = str(current_user.id)
     db.execute(
-        f"UPDATE user_settings SET {set_clause}, updated_at = NOW() WHERE user_id = :uid",
+        text(f"UPDATE user_settings SET {set_clause}, updated_at = NOW() WHERE user_id = :uid"),
         update_fields
     )
     db.commit()

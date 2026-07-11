@@ -3,6 +3,7 @@ import string
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.database import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -64,7 +65,7 @@ async def send_otp_email(email: str, otp: str, otp_type: str):
             start_tls=True
         )
     except Exception:
-        pass  # Email failure should not block registration flow in dev
+        pass
 
 
 @router.post("/register")
@@ -93,7 +94,7 @@ async def register(data: RegisterRequest, db: Session = Depends(get_db)):
     expires = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     db.execute(
-        "INSERT INTO otp_verifications (user_id, email, otp_code, otp_type, expires_at) VALUES (:uid, :email, :otp, :type, :exp)",
+        text("INSERT INTO otp_verifications (user_id, email, otp_code, otp_type, expires_at) VALUES (:uid, :email, :otp, :type, :exp)"),
         {"uid": str(user.id), "email": data.email, "otp": otp, "type": "register", "exp": expires}
     )
     db.commit()
@@ -110,10 +111,10 @@ async def register(data: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/verify-otp")
 async def verify_otp(data: VerifyOTPRequest, db: Session = Depends(get_db)):
     result = db.execute(
-        """SELECT * FROM otp_verifications
+        text("""SELECT * FROM otp_verifications
            WHERE email = :email AND otp_code = :otp AND otp_type = :type
            AND is_used = FALSE AND expires_at > NOW()
-           ORDER BY created_at DESC LIMIT 1""",
+           ORDER BY created_at DESC LIMIT 1"""),
         {"email": data.email, "otp": data.otp_code, "type": data.otp_type}
     ).fetchone()
 
@@ -121,13 +122,13 @@ async def verify_otp(data: VerifyOTPRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
     db.execute(
-        "UPDATE otp_verifications SET is_used = TRUE WHERE id = :id",
+        text("UPDATE otp_verifications SET is_used = TRUE WHERE id = :id"),
         {"id": result.id}
     )
 
     if data.otp_type == "register":
         db.execute(
-            "UPDATE users SET is_verified = TRUE WHERE email = :email",
+            text("UPDATE users SET is_verified = TRUE WHERE email = :email"),
             {"email": data.email}
         )
     db.commit()
@@ -150,21 +151,19 @@ async def login(data: LoginRequest, db: Session = Depends(get_db)):
     expires_at = datetime.now(timezone.utc) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
 
     db.execute(
-        "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (:uid, :token, :exp)",
+        text("INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (:uid, :token, :exp)"),
         {"uid": str(user.id), "token": refresh_token, "exp": expires_at}
     )
     db.execute(
-        "UPDATE users SET last_login = NOW() WHERE id = :id",
+        text("UPDATE users SET last_login = NOW() WHERE id = :id"),
         {"id": str(user.id)}
     )
     db.commit()
 
-    # Log login activity
     try:
         db.execute(
-            """INSERT INTO activity_logs (user_id, action, resource_type, details)
-               VALUES (:uid, 'login', 'session', :details)""",
-            {"uid": str(user.id), "details": {"email": user.email}}
+            text("INSERT INTO activity_logs (user_id, action, resource_type, details) VALUES (:uid, 'login', 'session', :details)"),
+            {"uid": str(user.id), "details": '{"source":"login"}'}
         )
         db.commit()
     except Exception:
@@ -188,10 +187,10 @@ async def login(data: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/refresh")
 async def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     result = db.execute(
-        """SELECT rt.*, u.id as uid, u.email FROM refresh_tokens rt
+        text("""SELECT rt.*, u.id as uid, u.email FROM refresh_tokens rt
            JOIN users u ON rt.user_id = u.id
            WHERE rt.token = :token AND rt.is_revoked = FALSE
-           AND rt.expires_at > NOW() AND u.is_active = TRUE""",
+           AND rt.expires_at > NOW() AND u.is_active = TRUE"""),
         {"token": data.refresh_token}
     ).fetchone()
 
@@ -209,7 +208,7 @@ async def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)
 @router.post("/logout")
 async def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     db.execute(
-        "UPDATE refresh_tokens SET is_revoked = TRUE WHERE token = :token",
+        text("UPDATE refresh_tokens SET is_revoked = TRUE WHERE token = :token"),
         {"token": data.refresh_token}
     )
     db.commit()
@@ -219,12 +218,11 @@ async def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
 @router.post("/forgot-password")
 async def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
-    # Always return success to prevent email enumeration
     if user:
         otp = generate_otp()
         expires = datetime.now(timezone.utc) + timedelta(minutes=10)
         db.execute(
-            "INSERT INTO otp_verifications (user_id, email, otp_code, otp_type, expires_at) VALUES (:uid, :email, :otp, :type, :exp)",
+            text("INSERT INTO otp_verifications (user_id, email, otp_code, otp_type, expires_at) VALUES (:uid, :email, :otp, :type, :exp)"),
             {"uid": str(user.id), "email": data.email, "otp": otp, "type": "reset_password", "exp": expires}
         )
         db.commit()
@@ -236,10 +234,10 @@ async def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get
 @router.post("/reset-password")
 async def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
     result = db.execute(
-        """SELECT * FROM otp_verifications
+        text("""SELECT * FROM otp_verifications
            WHERE email = :email AND otp_code = :otp AND otp_type = 'reset_password'
            AND is_used = FALSE AND expires_at > NOW()
-           ORDER BY created_at DESC LIMIT 1""",
+           ORDER BY created_at DESC LIMIT 1"""),
         {"email": data.email, "otp": data.otp_code}
     ).fetchone()
 
@@ -248,15 +246,15 @@ async def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_d
 
     new_hash = hash_password(data.new_password)
     db.execute(
-        "UPDATE users SET password_hash = :hash WHERE email = :email",
+        text("UPDATE users SET password_hash = :hash WHERE email = :email"),
         {"hash": new_hash, "email": data.email}
     )
     db.execute(
-        "UPDATE otp_verifications SET is_used = TRUE WHERE id = :id",
+        text("UPDATE otp_verifications SET is_used = TRUE WHERE id = :id"),
         {"id": result.id}
     )
     db.execute(
-        "UPDATE refresh_tokens SET is_revoked = TRUE WHERE user_id = (SELECT id FROM users WHERE email = :email)",
+        text("UPDATE refresh_tokens SET is_revoked = TRUE WHERE user_id = (SELECT id FROM users WHERE email = :email)"),
         {"email": data.email}
     )
     db.commit()
