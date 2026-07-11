@@ -1,0 +1,162 @@
+/* ── Fade ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Slide ── */
+@keyframes slideInBottom {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideOutBottom {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ── Scale / Bounce ── */
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0.3);  opacity: 0; }
+  50%  { transform: scale(1.06); opacity: 0.9; }
+  70%  { transform: scale(0.96); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.22); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.14); }
+  70%       { transform: scale(1); }
+}
+
+/* ── Pulse / Glow ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(233,30,140,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(233,30,140,0.6); }
+}
+
+@keyframes glowText {
+  0%, 100% { text-shadow: 0 0 20px rgba(233,30,140,0.5); }
+  50%       { text-shadow: 0 0 40px rgba(233,30,140,0.9), 0 0 60px rgba(124,58,237,0.4); }
+}
+
+/* ── Spin ── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes spinPulse {
+  0%   { transform: rotate(0deg)   scale(1); }
+  50%  { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* ── Float ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ── Shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+/* ── Shake ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-6px); }
+  30%, 70%      { transform: translateX(6px); }
+}
+
+/* ── Ripple ── */
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── Splash particles ── */
+@keyframes particleFloat {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-120px) rotate(720deg); opacity: 0; }
+}
+
+/* ── Utility Classes ── */
+.animate-fadeIn       { animation: fadeIn 0.4s var(--ease-smooth) forwards; }
+.animate-fadeInUp     { animation: fadeInUp 0.5s var(--ease-smooth) forwards; }
+.animate-fadeInScale  { animation: fadeInScale 0.4s var(--ease-spring) forwards; }
+.animate-bounceIn     { animation: bounceIn 0.6s var(--ease-bounce) forwards; }
+.animate-heartbeat    { animation: heartbeat 1.4s ease-in-out infinite; }
+.animate-pulse        { animation: pulse 2s ease-in-out infinite; }
+.animate-spin         { animation: spin 1s linear infinite; }
+.animate-float        { animation: float 3s ease-in-out infinite; }
+.animate-shake        { animation: shake 0.4s var(--ease-smooth); }
+.animate-glow         { animation: glowPulse 2s ease-in-out infinite; }
+.animate-glowText     { animation: glowText 2s ease-in-out infinite; }
+
+/* ── Stagger delays ── */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* ── Page transitions ── */
+.page-enter {
+  animation: fadeInUp 0.35s var(--ease-smooth) forwards;
+}
+
+/* ── Ripple effect ── */
+.ripple-container { position: relative; overflow: hidden; }
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}

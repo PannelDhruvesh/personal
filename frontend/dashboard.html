@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Home — Its Billi ❤️</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <div id="app" class="app-container">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div>
+        <p class="greeting-text">Hello 👋</p>
+        <p class="greeting-name" id="greeting-name">Loading...</p>
+      </div>
+      <a href="/profile.html">
+        <div class="avatar avatar-md" id="user-avatar" style="background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;">?</div>
+      </a>
+    </header>
+
+    <!-- Scrollable content -->
+    <main class="page-content page-enter" style="padding-top:72px;">
+
+      <!-- Storage Widget -->
+      <div class="storage-widget animate-fadeInUp" style="margin-bottom:20px;">
+        <div class="storage-header">
+          <span class="storage-title">💾 Storage Used</span>
+          <span class="storage-value">
+            <span id="storage-used-text">—</span> / <span id="storage-limit-text">—</span>
+          </span>
+        </div>
+        <div class="storage-used" id="storage-pct">—</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="storage-progress" style="width:0%;"></div>
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="stats-row animate-fadeInUp delay-100">
+        <div class="stat-card">
+          <div class="stat-icon">📸</div>
+          <div class="stat-value" id="stat-photos">—</div>
+          <div class="stat-label">Photos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎬</div>
+          <div class="stat-value" id="stat-videos">—</div>
+          <div class="stat-label">Videos</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/gallery.html?filter=favorites'">
+          <div class="stat-icon">❤️</div>
+          <div class="stat-value">♾</div>
+          <div class="stat-label">Favorites</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions animate-fadeInUp delay-200">
+        <div class="quick-action-btn" onclick="location.href='/upload.html'">
+          <div class="quick-action-icon">📤</div>
+          <div class="quick-action-label">Upload</div>
+          <div class="quick-action-sub">Photos & videos</div>
+        </div>
+        <div class="quick-action-btn" onclick="location.href='/album.html'">
+          <div class="quick-action-icon">📁</div>
+          <div class="quick-action-label">Albums</div>
+          <div class="quick-action-sub">Organize memories</div>
+        </div>
+        <div class="quick-action-btn" onclick="location.href='/gallery.html'">
+          <div class="quick-action-icon">🖼️</div>
+          <div class="quick-action-label">Gallery</div>
+          <div class="quick-action-sub">All memories</div>
+        </div>
+        <div class="quick-action-btn" onclick="location.href='/gallery.html?filter=favorites'">
+          <div class="quick-action-icon">❤️</div>
+          <div class="quick-action-label">Favorites</div>
+          <div class="quick-action-sub">Your best ones</div>
+        </div>
+      </div>
+
+      <!-- Recent memories -->
+      <div class="dash-section animate-fadeInUp delay-300">
+        <div class="section-header">
+          <span class="section-title">Recent memories</span>
+          <a href="/gallery.html" class="section-action">See all →</a>
+        </div>
+        <div class="recent-strip" id="recent-strip">
+          <div class="skeleton" style="width:90px;height:90px;border-radius:14px;flex-shrink:0;"></div>
+          <div class="skeleton" style="width:90px;height:90px;border-radius:14px;flex-shrink:0;"></div>
+          <div class="skeleton" style="width:90px;height:90px;border-radius:14px;flex-shrink:0;"></div>
+          <div class="skeleton" style="width:90px;height:90px;border-radius:14px;flex-shrink:0;"></div>
+          <div class="skeleton" style="width:90px;height:90px;border-radius:14px;flex-shrink:0;"></div>
+        </div>
+      </div>
+
+      <!-- Albums -->
+      <div class="dash-section animate-fadeInUp delay-400">
+        <div class="section-header">
+          <span class="section-title">Albums</span>
+          <a href="/album.html" class="section-action">See all →</a>
+        </div>
+        <div class="albums-grid-mini" id="albums-mini-grid">
+          <div class="skeleton" style="height:140px;border-radius:14px;"></div>
+          <div class="skeleton" style="height:140px;border-radius:14px;"></div>
+          <div class="skeleton" style="height:140px;border-radius:14px;"></div>
+          <div class="skeleton" style="height:140px;border-radius:14px;"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom navbar -->
+    <nav class="bottom-nav">
+      <a href="/dashboard.html" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="/albums.html" class="nav-item">
+        <span class="nav-icon">📁</span>
+        <span class="nav-label">Albums</span>
+      </a>
+      <a href="/upload.html" class="nav-item nav-fab">
+        <span class="nav-fab-icon">+</span>
+      </a>
+      <a href="/gallery.html" class="nav-item">
+        <span class="nav-icon">🖼️</span>
+        <span class="nav-label">Gallery</span>
+      </a>
+      <a href="/profile.html" class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <style>
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: var(--app-max-width);
+      height: calc(var(--navbar-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid var(--dark-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: var(--z-navbar);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+      padding: 8px 0;
+      text-decoration: none;
+      color: var(--dark-muted);
+      transition: var(--transition-base);
+      position: relative;
+    }
+    .nav-item.active { color: var(--pink-500); }
+    .nav-item.active .nav-icon { transform: scale(1.15); }
+    .nav-icon { font-size: 22px; transition: transform 0.2s var(--ease-spring); }
+    .nav-label { font-size: 10px; font-weight: 600; }
+    .nav-fab {
+      width: 56px; height: 56px;
+      background: var(--gradient-primary);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(233,30,140,0.5);
+      margin-top: -16px;
+      flex: 0 0 56px;
+    }
+    .nav-fab-icon { font-size: 28px; color: white; font-weight: 300; line-height: 1; }
+    .nav-item:active { transform: scale(0.92); }
+    .nav-fab:active { transform: scale(0.92) translateY(0) !important; }
+  </style>
+
+  <script src="config.js"></script>
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

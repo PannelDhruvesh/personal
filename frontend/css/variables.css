@@ -1,0 +1,108 @@
+:root {
+  /* ── Brand Colors ── */
+  --pink-50:  #fff0f5;
+  --pink-100: #ffd6e7;
+  --pink-200: #ffadd1;
+  --pink-300: #ff85bb;
+  --pink-400: #ff5ba5;
+  --pink-500: #e91e8c;
+  --pink-600: #c4177a;
+  --pink-700: #9c1261;
+
+  --purple-50:  #f5f0ff;
+  --purple-100: #e6d9ff;
+  --purple-200: #ccb3ff;
+  --purple-300: #b38dff;
+  --purple-400: #9966ff;
+  --purple-500: #7c3aed;
+  --purple-600: #6d28d9;
+
+  --cream: #fffbf5;
+  --white: #ffffff;
+
+  /* ── Dark Mode Palette ── */
+  --dark-bg:       #0d0d0d;
+  --dark-surface:  #181820;
+  --dark-card:     #1e1e2a;
+  --dark-border:   rgba(255,255,255,0.08);
+  --dark-text:     #f5f0ff;
+  --dark-subtext:  #a89fc0;
+  --dark-muted:    #6b6480;
+
+  /* ── Glassmorphism ── */
+  --glass-bg:     rgba(30, 30, 42, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-blur:   blur(20px);
+  --glass-light:  rgba(255, 255, 255, 0.06);
+
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #e91e8c 0%, #7c3aed 100%);
+  --gradient-soft:    linear-gradient(135deg, #ff85bb 0%, #9966ff 100%);
+  --gradient-card:    linear-gradient(145deg, rgba(233,30,140,0.15) 0%, rgba(124,58,237,0.15) 100%);
+  --gradient-glow:    radial-gradient(ellipse at center, rgba(233,30,140,0.25) 0%, transparent 70%);
+
+  /* ── Typography ── */
+  --font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+
+  --text-xs:   0.6875rem;
+  --text-sm:   0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md:   1.0625rem;
+  --text-lg:   1.1875rem;
+  --text-xl:   1.375rem;
+  --text-2xl:  1.625rem;
+  --text-3xl:  2rem;
+
+  /* ── Spacing ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border Radius ── */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-2xl:  36px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:   0 4px 20px rgba(0,0,0,0.4);
+  --shadow-lg:   0 8px 40px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 30px rgba(233,30,140,0.35);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.45);
+
+  /* ── Transitions ── */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-fast:   150ms var(--ease-smooth);
+  --transition-base:   250ms var(--ease-smooth);
+  --transition-slow:   400ms var(--ease-smooth);
+  --transition-spring: 350ms var(--ease-spring);
+
+  /* ── Z-index ── */
+  --z-base:    1;
+  --z-card:    10;
+  --z-sticky:  100;
+  --z-navbar:  200;
+  --z-modal:   300;
+  --z-toast:   400;
+  --z-loader:  500;
+  --z-splash:  999;
+
+  /* ── Layout ── */
+  --app-max-width: 430px;
+  --navbar-height: 72px;
+  --topbar-height: 60px;
+  --safe-bottom:   env(safe-area-inset-bottom, 16px);
+}

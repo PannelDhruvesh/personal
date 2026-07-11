@@ -1,0 +1,164 @@
+/* ── Settings ── */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.settings-group {
+  background: var(--dark-card);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--dark-border);
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--dark-border);
+  transition: var(--transition-base);
+}
+
+.settings-item:last-child { border-bottom: none; }
+.settings-item:active { background: rgba(255,255,255,0.03); }
+
+.settings-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(233,30,140,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.settings-item-label {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--dark-text);
+}
+
+.settings-item-value {
+  font-size: var(--text-sm);
+  color: var(--dark-subtext);
+}
+
+/* ── Toggle Switch ── */
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--dark-surface);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: 0.3s;
+  border: 1.5px solid var(--dark-border);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 23px;
+  width: 23px;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--dark-subtext);
+  border-radius: 50%;
+  transition: 0.3s var(--ease-spring);
+}
+
+.toggle input:checked + .toggle-slider {
+  background: var(--gradient-primary);
+  border-color: transparent;
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(20px) translateY(-50%);
+  background: white;
+}
+
+/* ── Radio options ── */
+.radio-group {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border: 1.5px solid var(--dark-border);
+  background: var(--glass-light);
+  color: var(--dark-subtext);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.radio-option.selected {
+  border-color: var(--pink-500);
+  background: rgba(233,30,140,0.12);
+  color: var(--pink-400);
+}
+
+/* ── Storage bar ── */
+.storage-breakdown {
+  padding: var(--space-5);
+  background: var(--dark-card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--dark-border);
+  margin: 0 var(--space-5) var(--space-5);
+}
+
+.storage-bar-wrap {
+  margin: var(--space-4) 0;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--dark-surface);
+  overflow: hidden;
+  display: flex;
+}
+
+.storage-bar-photos {
+  height: 100%;
+  background: var(--pink-500);
+  transition: width 0.6s var(--ease-smooth);
+}
+
+.storage-bar-videos {
+  height: 100%;
+  background: var(--purple-500);
+  transition: width 0.6s var(--ease-smooth);
+}
+
+.storage-legend {
+  display: flex;
+  gap: var(--space-5);
+  font-size: var(--text-xs);
+  color: var(--dark-subtext);
+}
+
+.storage-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}

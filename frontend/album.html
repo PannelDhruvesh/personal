@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Album — Its Billi ❤️</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/gallery.css" />
+</head>
+<body>
+  <div id="app" class="app-container">
+
+    <header class="topbar">
+      <button class="btn btn-icon" onclick="history.back()">←</button>
+      <div style="text-align:center;">
+        <div class="topbar-title" id="album-name">Album</div>
+        <div style="font-size:11px;color:var(--dark-subtext);" id="album-count">Loading...</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-icon" id="album-fav-btn" title="Favorite">🤍</button>
+        <button class="btn btn-icon" id="album-more-btn" title="More">⋯</button>
+      </div>
+    </header>
+
+    <main style="padding-top:72px;padding-bottom:calc(72px + var(--safe-bottom));">
+      <div id="album-grid" class="media-grid grid-medium" style="padding:3px;"></div>
+      <div id="scroll-sentinel" style="height:1px;"></div>
+      <div id="load-spinner" style="display:none;justify-content:center;padding:32px;">
+        <div style="width:32px;height:32px;border:3px solid rgba(233,30,140,0.3);border-top-color:var(--pink-500);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      </div>
+    </main>
+
+    <!-- FAB: upload to this album -->
+    <a href="#" id="fab-upload" style="position:fixed;bottom:calc(80px + var(--safe-bottom));right:20px;width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 20px rgba(233,30,140,0.5);z-index:150;text-decoration:none;color:white;">
+      📤
+    </a>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="/album.html"     class="nav-item active"><span class="nav-icon">📁</span><span class="nav-label">Albums</span></a>
+      <a href="/upload.html"    class="nav-item nav-fab"><span class="nav-fab-icon">+</span></a>
+      <a href="/gallery.html"   class="nav-item"><span class="nav-icon">🖼️</span><span class="nav-label">Gallery</span></a>
+      <a href="/profile.html"   class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></a>
+    </nav>
+
+    <!-- More options sheet -->
+    <div id="more-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:250;backdrop-filter:blur(6px);"></div>
+    <div id="more-sheet" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--dark-surface);border-radius:28px 28px 0 0;z-index:260;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);border-top:1px solid var(--dark-border);padding:20px;">
+      <div style="width:40px;height:4px;background:var(--dark-border);border-radius:2px;margin:0 auto 20px;"></div>
+      <button class="btn btn-secondary btn-full" id="album-rename-btn" style="margin-bottom:10px;">✏️ Rename Album</button>
+      <button class="btn btn-secondary btn-full" id="album-hide-btn" style="margin-bottom:10px;">👁 Hide Album</button>
+      <button class="btn btn-full" id="album-delete-btn" style="background:rgba(255,107,138,0.15);color:#ff6b8a;border:1px solid rgba(255,107,138,0.3);border-radius:999px;padding:14px;font-weight:600;margin-bottom:16px;">🗑️ Delete Album</button>
+      <button class="btn btn-ghost btn-full" id="close-more">Cancel</button>
+    </div>
+
+  </div>
+
+  <style>
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--app-max-width);height:calc(var(--navbar-height) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:rgba(13,13,13,0.92);backdrop-filter:blur(24px);border-top:1px solid var(--dark-border);display:flex;align-items:center;justify-content:space-around;z-index:var(--z-navbar);}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;padding:8px 0;text-decoration:none;color:var(--dark-muted);}
+    .nav-item.active{color:var(--pink-500);}
+    .nav-icon{font-size:22px;}
+    .nav-label{font-size:10px;font-weight:600;}
+    .nav-fab{width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(233,30,140,0.5);margin-top:-16px;flex:0 0 56px;}
+    .nav-fab-icon{font-size:28px;color:white;font-weight:300;line-height:1;}
+    .nav-item:active{transform:scale(0.92);}
+    #album-fav-btn.active{color:var(--pink-500);}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  </style>
+
+  <script>
+    const moreBtn = document.getElementById('album-more-btn');
+    const moreSheet = document.getElementById('more-sheet');
+    const moreBackdrop = document.getElementById('more-backdrop');
+    const closeMore = document.getElementById('close-more');
+    function openMore(){ moreSheet.style.transform='translateX(-50%) translateY(0)'; moreBackdrop.style.display='block'; }
+    function closeMoreFn(){ moreSheet.style.transform='translateX(-50%) translateY(100%)'; moreBackdrop.style.display='none'; }
+    moreBtn?.addEventListener('click', openMore);
+    closeMore?.addEventListener('click', closeMoreFn);
+    moreBackdrop?.addEventListener('click', closeMoreFn);
+
+    // Set upload FAB href
+    const p = new URLSearchParams(location.search);
+    const albumId = p.get('id');
+    document.getElementById('fab-upload').href = `/upload.html${albumId ? '?album_id='+albumId : ''}`;
+  </script>
+
+  <script src="config.js"></script>
+  <script type="module" src="js/album.js"></script>
+</body>
+</html>

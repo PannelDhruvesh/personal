@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Settings — Its Billi ❤️</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/settings.css" />
+</head>
+<body>
+  <div id="app" class="app-container">
+
+    <header class="topbar">
+      <button class="btn btn-icon" onclick="history.back()">←</button>
+      <span class="topbar-title">Settings</span>
+      <div style="width:44px;"></div>
+    </header>
+
+    <main style="padding-top:72px;padding-bottom:calc(40px + var(--safe-bottom));overflow-y:auto;">
+
+      <!-- Storage -->
+      <p class="menu-section-title">Storage</p>
+      <div class="storage-breakdown">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:14px;color:var(--dark-subtext);">Used</span>
+          <span style="font-size:14px;font-weight:700;color:var(--dark-text);"><span id="storage-used">—</span> / <span id="storage-limit">—</span></span>
+        </div>
+        <div style="font-size:22px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;" id="storage-pct">—</div>
+        <div class="progress-bar" style="margin-bottom:16px;">
+          <div class="progress-fill" id="main-storage-bar" style="width:0%;"></div>
+        </div>
+        <div class="storage-bar-wrap">
+          <div class="storage-bar-photos" id="storage-photos-bar" style="width:0%;"></div>
+          <div class="storage-bar-videos" id="storage-videos-bar" style="width:0%;"></div>
+        </div>
+        <div class="storage-legend" style="margin-top:10px;">
+          <span><span class="storage-legend-dot" style="background:var(--pink-500);"></span>Photos: <span id="storage-photos">—</span></span>
+          <span><span class="storage-legend-dot" style="background:var(--purple-500);"></span>Videos: <span id="storage-videos">—</span></span>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--dark-subtext);">Trash: <span id="storage-trash">—</span></div>
+        <button class="btn btn-full" id="empty-trash-btn" style="margin-top:14px;background:rgba(255,107,138,0.12);color:#ff6b8a;border:1px solid rgba(255,107,138,0.25);border-radius:999px;padding:12px;font-weight:600;font-size:13px;">🗑️ Empty Trash</button>
+      </div>
+
+      <!-- Appearance -->
+      <p class="menu-section-title">Appearance</p>
+      <div class="settings-list" style="padding:0 16px;">
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-icon">🌙</div>
+            <span class="settings-item-label">Dark Mode</span>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-darkmode" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon">⊞</div>
+            <span class="settings-item-label">Grid Size</span>
+            <div class="radio-group">
+              <span class="radio-option" data-grid-size="small">S</span>
+              <span class="radio-option selected" data-grid-size="medium">M</span>
+              <span class="radio-option" data-grid-size="large">L</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <p class="menu-section-title">Privacy</p>
+      <div class="settings-list" style="padding:0 16px;">
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-icon">👁</div>
+            <span class="settings-item-label">Show Hidden Albums</span>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-hidden" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-item" id="change-password-btn" style="cursor:pointer;">
+            <div class="settings-item-icon">🔑</div>
+            <span class="settings-item-label">Change Password</span>
+            <span class="settings-item-value">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <p class="menu-section-title">Notifications</p>
+      <div class="settings-list" style="padding:0 16px;">
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-icon">🔔</div>
+            <span class="settings-item-label">Notifications</span>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-notifications" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon">☁️</div>
+            <span class="settings-item-label">Auto Backup</span>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-backup" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <p class="menu-section-title">About</p>
+      <div class="settings-list" style="padding:0 16px;">
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-icon">❤️</div>
+            <span class="settings-item-label">Its Billi</span>
+            <span class="settings-item-value">v1.0.0</span>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon">🔐</div>
+            <span class="settings-item-label">Privacy Policy</span>
+            <span class="settings-item-value">›</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Change Password Modal -->
+    <div id="change-password-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+      <div style="width:100%;max-width:430px;background:var(--dark-surface);border-radius:28px 28px 0 0;padding:24px 20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0));border-top:1px solid var(--dark-border);">
+        <div style="width:40px;height:4px;background:var(--dark-border);border-radius:2px;margin:0 auto 20px;"></div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">Change Password</h3>
+        <form id="change-password-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="input-group">
+            <label class="input-label">Current password</label>
+            <input type="password" id="current-password" class="input-field" placeholder="Current password" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">New password</label>
+            <input type="password" id="new-password" class="input-field" placeholder="New password (min 8 chars)" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Confirm new password</label>
+            <input type="password" id="confirm-password" class="input-field" placeholder="Confirm new password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Update Password</button>
+          <button type="button" class="btn btn-ghost btn-full" data-close-modal="change-password-modal">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    #change-password-modal.open { display:flex!important; }
+  </style>
+
+  <script src="config.js"></script>
+  <script type="module" src="js/settings.js"></script>
+</body>
+</html>

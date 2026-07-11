@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Profile — Its Billi ❤️</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+</head>
+<body>
+  <div id="app" class="app-container">
+
+    <main style="padding-bottom:calc(72px + var(--safe-bottom));overflow-y:auto;height:100vh;height:100dvh;">
+
+      <!-- Cover + Avatar -->
+      <div class="profile-cover">
+        <div style="position:absolute;top:16px;right:16px;padding-top:env(safe-area-inset-top,0);">
+          <a href="/settings.html" style="width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(8px);">⚙️</a>
+        </div>
+      </div>
+
+      <div style="position:relative;padding:0 20px;">
+        <div class="profile-avatar-wrap">
+          <div id="profile-avatar" class="profile-avatar" style="display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white;background:var(--gradient-primary);"></div>
+          <label class="profile-avatar-edit" for="avatar-input">✏️</label>
+          <input type="file" id="avatar-input" accept="image/*" style="display:none;" />
+        </div>
+
+        <div style="margin-top:52px;display:flex;justify-content:flex-end;">
+          <button class="btn btn-secondary" id="edit-profile-btn" style="padding:10px 20px;font-size:13px;">Edit Profile</button>
+        </div>
+      </div>
+
+      <div class="profile-info">
+        <h1 class="profile-name" id="profile-name">Loading...</h1>
+        <p class="profile-username" id="profile-username">@username</p>
+        <p class="profile-bio" id="profile-bio"></p>
+        <p style="font-size:12px;color:var(--dark-subtext);margin-top:8px;">💾 <span id="profile-storage">—</span></p>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="stat-photos">—</div>
+          <div class="profile-stat-label">Photos</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="stat-videos">—</div>
+          <div class="profile-stat-label">Videos</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="stat-storage-pct">—</div>
+          <div class="profile-stat-label">Used</div>
+        </div>
+      </div>
+
+      <!-- Menu sections -->
+      <p class="menu-section-title">Media</p>
+      <div class="menu-list">
+        <a href="/gallery.html" class="menu-item">
+          <div class="menu-item-icon">🖼️</div>
+          <div class="menu-item-content"><div class="menu-item-label">Gallery</div><div class="menu-item-sub">All your memories</div></div>
+          <span class="menu-item-arrow">›</span>
+        </a>
+        <a href="/gallery.html?filter=favorites" class="menu-item">
+          <div class="menu-item-icon" style="background:rgba(233,30,140,0.12);">❤️</div>
+          <div class="menu-item-content"><div class="menu-item-label">Favorites</div><div class="menu-item-sub">Your best memories</div></div>
+          <span class="menu-item-arrow">›</span>
+        </a>
+        <a href="/gallery.html?trash=1" class="menu-item">
+          <div class="menu-item-icon red">🗑️</div>
+          <div class="menu-item-content"><div class="menu-item-label">Trash</div><div class="menu-item-sub">Recently deleted</div></div>
+          <span class="menu-item-arrow">›</span>
+        </a>
+      </div>
+
+      <p class="menu-section-title">Account</p>
+      <div class="menu-list">
+        <a href="/settings.html" class="menu-item">
+          <div class="menu-item-icon purple">⚙️</div>
+          <div class="menu-item-content"><div class="menu-item-label">Settings</div><div class="menu-item-sub">App preferences</div></div>
+          <span class="menu-item-arrow">›</span>
+        </a>
+        <div class="menu-item" id="logout-btn" style="cursor:pointer;">
+          <div class="menu-item-icon red">🚪</div>
+          <div class="menu-item-content"><div class="menu-item-label" style="color:#ff6b8a;">Sign Out</div></div>
+          <span class="menu-item-arrow">›</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="/album.html"     class="nav-item"><span class="nav-icon">📁</span><span class="nav-label">Albums</span></a>
+      <a href="/upload.html"    class="nav-item nav-fab"><span class="nav-fab-icon">+</span></a>
+      <a href="/gallery.html"   class="nav-item"><span class="nav-icon">🖼️</span><span class="nav-label">Gallery</span></a>
+      <a href="/profile.html"   class="nav-item active"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></a>
+    </nav>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+      <div style="width:100%;max-width:430px;background:var(--dark-surface);border-radius:28px 28px 0 0;padding:24px 20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0));border-top:1px solid var(--dark-border);">
+        <div style="width:40px;height:4px;background:var(--dark-border);border-radius:2px;margin:0 auto 20px;"></div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">Edit Profile</h3>
+        <form id="edit-profile-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="input-group">
+            <label class="input-label">Display name</label>
+            <input type="text" id="edit-name-input" class="input-field" placeholder="Your name" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Bio</label>
+            <textarea id="edit-bio-input" class="input-field" rows="3" placeholder="Write something about yourself..." style="resize:none;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+          <button type="button" class="btn btn-ghost btn-full" data-close-modal="edit-profile-modal">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--app-max-width);height:calc(var(--navbar-height) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:rgba(13,13,13,0.92);backdrop-filter:blur(24px);border-top:1px solid var(--dark-border);display:flex;align-items:center;justify-content:space-around;z-index:var(--z-navbar);}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;padding:8px 0;text-decoration:none;color:var(--dark-muted);}
+    .nav-item.active{color:var(--pink-500);}
+    .nav-icon{font-size:22px;}
+    .nav-label{font-size:10px;font-weight:600;}
+    .nav-fab{width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(233,30,140,0.5);margin-top:-16px;flex:0 0 56px;}
+    .nav-fab-icon{font-size:28px;color:white;font-weight:300;line-height:1;}
+    #edit-profile-modal.open{display:flex!important;}
+  </style>
+
+  <script src="config.js"></script>
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>
