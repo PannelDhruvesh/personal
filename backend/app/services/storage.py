@@ -40,7 +40,10 @@ def generate_signed_url(storage_path: str, expires_in: int = 3600) -> Optional[s
             path=storage_path,
             expires_in=expires_in
         )
-        return response.get("signedURL") or response.get("signed_url")
+        if isinstance(response, dict):
+            return response.get("signedURL") or response.get("signed_url") or response.get("signedUrl")
+        # newer supabase-py returns object
+        return getattr(response, "signed_url", None) or getattr(response, "signedURL", None)
     except Exception:
         return None
 
@@ -53,7 +56,9 @@ def generate_signed_download_url(storage_path: str, expires_in: int = 3600) -> O
             expires_in=expires_in,
             options={"download": True}
         )
-        return response.get("signedURL") or response.get("signed_url")
+        if isinstance(response, dict):
+            return response.get("signedURL") or response.get("signed_url") or response.get("signedUrl")
+        return getattr(response, "signed_url", None) or getattr(response, "signedURL", None)
     except Exception:
         return None
 

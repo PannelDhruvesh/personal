@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from decimal import Decimal
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -8,6 +9,13 @@ from app.models.file import File
 from app.utils.response import success_response
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
+
+
+def to_int(val) -> int:
+    """Convert Decimal/float/None to int safely."""
+    if val is None:
+        return 0
+    return int(val)
 
 
 @router.get("/storage-usage")
@@ -41,19 +49,19 @@ async def get_storage_usage(
         File.is_deleted == True
     ).first()
 
-    used = current_user.storage_used
-    limit = current_user.storage_limit
+    used  = to_int(current_user.storage_used)
+    limit = to_int(current_user.storage_limit)
     percent = round((used / limit) * 100, 2) if limit else 0
 
     return success_response(data={
-        "used_bytes": used,
-        "limit_bytes": limit,
-        "percent_used": percent,
-        "used_formatted": format_bytes(used),
+        "used_bytes":      used,
+        "limit_bytes":     limit,
+        "percent_used":    percent,
+        "used_formatted":  format_bytes(used),
         "limit_formatted": format_bytes(limit),
-        "photos": {"count": photo_stats.count, "size": photo_stats.size},
-        "videos": {"count": video_stats.count, "size": video_stats.size},
-        "trash": {"count": trash_stats.count, "size": trash_stats.size},
+        "photos": {"count": to_int(photo_stats.count), "size": to_int(photo_stats.size)},
+        "videos": {"count": to_int(video_stats.count), "size": to_int(video_stats.size)},
+        "trash":  {"count": to_int(trash_stats.count), "size": to_int(trash_stats.size)},
     })
 
 

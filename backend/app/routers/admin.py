@@ -74,7 +74,7 @@ async def get_stats(
     total_photos = db.query(func.count(File.id)).filter(File.file_type == "photo", File.is_deleted == False).scalar()
     total_videos = db.query(func.count(File.id)).filter(File.file_type == "video", File.is_deleted == False).scalar()
     total_albums = db.query(func.count(Album.id)).filter(Album.is_deleted == False).scalar()
-    total_storage = db.query(func.coalesce(func.sum(File.file_size), 0)).filter(File.is_deleted == False).scalar()
+    total_storage = int(db.query(func.coalesce(func.sum(File.file_size), 0)).filter(File.is_deleted == False).scalar() or 0)
     trash_files = db.query(func.count(File.id)).filter(File.is_deleted == True).scalar()
 
     # New users in last 7 days
