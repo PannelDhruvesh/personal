@@ -7,10 +7,15 @@ window.APP_CONFIG = {
 (function() {
   const bg = localStorage.getItem('app_bg_image');
   if (bg) {
-    document.documentElement.style.cssText += ``;
+    const x = localStorage.getItem('app_bg_x') || '50';
+    const y = localStorage.getItem('app_bg_y') || '50';
     const s = document.createElement('style');
-    s.textContent = `body{background-image:url(${bg})!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important;}body.has-bg #app::before,body.has-bg .app-container::before{opacity:1!important;}`;
+    s.textContent = `body{background-image:url(${bg})!important;background-size:cover!important;background-position:${x}% ${y}%!important;background-attachment:fixed!important;}`;
     document.head.appendChild(s);
-    document.addEventListener('DOMContentLoaded', () => document.body.classList.add('has-bg'));
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('has-bg');
+      const app = document.getElementById('app');
+      if (app) app.style.background = 'transparent';
+    });
   }
 })();
