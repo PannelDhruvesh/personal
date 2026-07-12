@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#080810" />
+  <meta name="theme-color" content="#04020f" />
   <title>Sign In — Its Billi</title>
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
@@ -11,10 +11,19 @@
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/login.css" />
 </head>
-<body>
+<body style="background:#04020f;">
   <div id="app">
     <div class="auth-page" id="auth-page">
-      <div class="auth-bg-orb"></div>
+
+      <!-- Nebula clouds -->
+      <div class="galaxy-nebula galaxy-nebula-1"></div>
+      <div class="galaxy-nebula galaxy-nebula-2"></div>
+      <div class="galaxy-nebula galaxy-nebula-3"></div>
+
+      <!-- Star field -->
+      <div class="star-field" id="star-field"></div>
+
+      <!-- Content -->
       <div class="auth-inner">
 
         <!-- Logo -->
@@ -36,7 +45,7 @@
             <div class="input-group">
               <label class="input-label" for="email">Email</label>
               <div class="input-wrapper">
-                <span class="input-icon" style="font-style:normal;font-size:14px;color:var(--purple-400);">@</span>
+                <span class="input-icon" style="font-style:normal;font-size:13px;color:var(--purple-300);font-weight:600;">@</span>
                 <input type="email" id="email" name="email" class="input-field"
                   placeholder="your@email.com" autocomplete="email" required />
               </div>
@@ -45,15 +54,17 @@
             <div class="input-group">
               <label class="input-label" for="password">Password</label>
               <div class="input-wrapper">
-                <span class="input-icon" style="font-style:normal;font-size:14px;color:var(--purple-400);">*</span>
+                <span class="input-icon" style="font-style:normal;font-size:15px;color:var(--purple-300);font-weight:700;">&#9632;</span>
                 <input type="password" id="password" name="password" class="input-field"
                   placeholder="Your password" autocomplete="current-password" required />
-                <span class="input-icon-right" id="toggle-password" style="font-size:13px;color:var(--purple-400);font-weight:600;letter-spacing:1px;">SHOW</span>
+                <span class="input-icon-right" id="toggle-password"
+                  style="font-size:11px;color:var(--purple-300);font-weight:700;letter-spacing:0.5px;">SHOW</span>
               </div>
             </div>
 
             <div style="text-align:right;margin-top:-8px;">
-              <a href="/forgot-password.html" style="font-size:var(--text-sm);color:var(--purple-400);font-weight:500;">
+              <a href="/forgot-password.html"
+                style="font-size:var(--text-sm);color:var(--purple-300);font-weight:500;">
                 Forgot password?
               </a>
             </div>
@@ -77,13 +88,50 @@
   </div>
 
   <script src="config.js"></script>
-  <script type="module" src="js/login.js"></script>
   <script>
-    // Apply saved background on load
+    // ── Generate star field ──
+    (function() {
+      const field = document.getElementById('star-field');
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2.5 + 0.5;
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const dur = (Math.random() * 4 + 2).toFixed(1);
+        const delay = (Math.random() * 5).toFixed(1);
+        const opacity = (Math.random() * 0.6 + 0.2).toFixed(2);
+        star.style.cssText = `
+          width:${size}px;height:${size}px;
+          left:${x}%;top:${y}%;
+          opacity:${opacity};
+          --dur:${dur}s;--delay:${delay}s;
+        `;
+        field.appendChild(star);
+      }
+
+      // Shooting stars
+      for (let i = 0; i < 4; i++) {
+        const s = document.createElement('div');
+        s.className = 'shooting-star';
+        const top = Math.random() * 50;
+        const left = Math.random() * 40;
+        const dur = (Math.random() * 3 + 3).toFixed(1);
+        const delay = (Math.random() * 10 + i * 3).toFixed(1);
+        s.style.cssText = `top:${top}%;left:${left}%;--dur:${dur}s;--delay:${delay}s;`;
+        field.appendChild(s);
+      }
+    })();
+
+    // Apply custom bg if saved
     const savedBg = localStorage.getItem('app_bg_image');
     if (savedBg) {
-      document.getElementById('auth-page').style.backgroundImage = `url(${savedBg})`;
+      const page = document.getElementById('auth-page');
+      page.style.backgroundImage = `url(${savedBg})`;
+      page.classList.add('has-custom-bg');
     }
   </script>
+  <script type="module" src="js/login.js"></script>
 </body>
 </html>

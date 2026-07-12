@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0d0d0d" />
-  <title>Create Account — Its Billi ❤️</title>
+  <meta name="theme-color" content="#04020f" />
+  <title>Create Account — Its Billi</title>
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/login.css" />
 </head>
-<body>
+<body style="background:#04020f;">
   <div id="app">
-    <div class="auth-page">
+    <div class="auth-page" id="auth-page">
+      <div class="galaxy-nebula galaxy-nebula-1"></div>
+      <div class="galaxy-nebula galaxy-nebula-2"></div>
+      <div class="star-field" id="star-field"></div>
       <div class="auth-inner">
 
         <!-- Logo -->
@@ -127,6 +130,9 @@
   </div>
 
   <script src="config.js"></script>
+  <script>
+    (function(){const f=document.getElementById('star-field');if(!f)return;for(let i=0;i<150;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2.5+0.5,x=Math.random()*100,y=Math.random()*100,d=(Math.random()*4+2).toFixed(1),dl=(Math.random()*5).toFixed(1),op=(Math.random()*0.6+0.2).toFixed(2);s.style.cssText=`width:${sz}px;height:${sz}px;left:${x}%;top:${y}%;opacity:${op};--dur:${d}s;--delay:${dl}s;`;f.appendChild(s);}})();
+  </script>
   <script type="module" src="js/register.js"></script>
 </body>
 </html>

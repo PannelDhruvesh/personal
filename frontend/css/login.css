@@ -1,4 +1,48 @@
-/* ── Auth Page ── */
+/* ═══════════════════════════════════════════
+   BTS GALAXY AUTH PAGE
+   Deep space: black → deep purple → violet
+   Stars, nebula clouds, shooting stars
+   ═══════════════════════════════════════════ */
+
+/* ── Star field via canvas-free technique ── */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+@keyframes shootingStar {
+  0%   { transform: translateX(0) translateY(0) rotate(-35deg); opacity: 1; width: 0; }
+  70%  { opacity: 1; width: 120px; }
+  100% { transform: translateX(300px) translateY(140px) rotate(-35deg); opacity: 0; width: 120px; }
+}
+@keyframes nebulaFloat {
+  0%, 100% { transform: scale(1) translate(0, 0);    opacity: 0.55; }
+  33%       { transform: scale(1.06) translate(8px, -10px); opacity: 0.65; }
+  66%       { transform: scale(0.97) translate(-6px, 6px);  opacity: 0.50; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-14px); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounceIn {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.1); }
+  80%  { transform: scale(0.96); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Base page ── */
 .auth-page {
   min-height: 100vh;
   min-height: 100dvh;
@@ -8,54 +52,91 @@
   justify-content: flex-start;
   padding: var(--space-8) var(--space-5) var(--space-8);
   overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
 
-  /* Custom background support */
-  background-color: var(--dark-bg);
-  background-image: var(--app-bg-image);
+  /* Deep space background */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%,  #3d0e7a 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%,  #5e1ab8 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 15% 80%,  #2a0a55 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 70% 10%,  #1a0535 0%, transparent 50%),
+    linear-gradient(180deg, #04020f 0%, #08031a 40%, #050118 100%);
+}
+
+/* Custom bg image support */
+.auth-page.has-custom-bg {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
 }
-
-/* Dark overlay when bg image is set */
-.auth-page::before {
+.auth-page.has-custom-bg::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: var(--app-bg-overlay);
+  background: rgba(4, 2, 15, 0.72);
   z-index: 0;
   pointer-events: none;
 }
 
-/* Purple glow orbs */
-.auth-page::after {
-  content: '';
+/* ── Nebula cloud layers ── */
+.galaxy-nebula {
   position: fixed;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(136,85,255,0.15) 0%, transparent 70%);
-  bottom: -100px;
-  left: -100px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
-  animation: float 8s ease-in-out infinite;
+  filter: blur(60px);
+  animation: nebulaFloat 12s ease-in-out infinite;
+}
+.galaxy-nebula-1 {
+  width: 320px; height: 280px;
+  background: radial-gradient(circle, rgba(124,45,232,0.45) 0%, rgba(94,26,184,0.2) 50%, transparent 70%);
+  top: 5%; left: 10%;
+  animation-delay: 0s;
+}
+.galaxy-nebula-2 {
+  width: 280px; height: 240px;
+  background: radial-gradient(circle, rgba(155,85,245,0.35) 0%, rgba(192,132,252,0.15) 50%, transparent 70%);
+  bottom: 15%; right: 5%;
+  animation-delay: -4s;
+}
+.galaxy-nebula-3 {
+  width: 200px; height: 180px;
+  background: radial-gradient(circle, rgba(90,26,184,0.30) 0%, transparent 70%);
+  top: 45%; left: 50%;
+  animation-delay: -8s;
 }
 
-.auth-bg-orb {
+/* ── Star field ── */
+.star-field {
   position: fixed;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(90,31,196,0.12) 0%, transparent 70%);
-  top: -80px;
-  right: -80px;
-  border-radius: 50%;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
-  animation: float 6s ease-in-out infinite reverse;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
 }
 
+/* ── Shooting stars ── */
+.shooting-star {
+  position: fixed;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(200,170,255,0.9) 50%, white 100%);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+  animation: shootingStar var(--dur, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+/* ── Content wrapper ── */
 .auth-inner {
   width: 100%;
   max-width: 390px;
@@ -63,56 +144,63 @@
   z-index: 1;
 }
 
-/* ── Logo section ── */
+/* ── Logo ── */
 .auth-logo {
   text-align: center;
   margin-bottom: var(--space-8);
-  animation: fadeInDown 0.6s var(--ease-smooth) forwards;
+  animation: fadeInDown 0.7s var(--ease-smooth) forwards;
 }
 
 .auth-logo-icon {
   width: 88px;
   height: 88px;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #9b55f5 0%, #5e1ab8 100%);
   border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto var(--space-4);
-  font-size: 36px;
+  font-size: 18px;
   font-weight: 900;
-  color: white;
-  letter-spacing: -1px;
-  box-shadow: 0 8px 32px rgba(136,85,255,0.5);
-  animation: bounceIn 0.8s var(--ease-spring) 0.2s both;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 1px;
+  box-shadow:
+    0 8px 32px rgba(124,45,232,0.6),
+    0 0 60px rgba(124,45,232,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  animation: bounceIn 0.9s var(--ease-spring) 0.2s both;
 }
 
 .auth-logo-title {
   font-size: var(--text-2xl);
   font-weight: 800;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #d0aaff 0%, #9b55f5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.5px;
+  letter-spacing: 1px;
 }
 
 .auth-logo-sub {
   font-size: var(--text-sm);
   color: var(--dark-subtext);
   margin-top: var(--space-1);
+  letter-spacing: 0.3px;
 }
 
 /* ── Card ── */
 .auth-card {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+  background: rgba(8, 5, 26, 0.72);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(155, 85, 245, 0.22);
   border-radius: var(--radius-2xl);
   padding: var(--space-8) var(--space-6);
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(136,85,255,0.08);
-  animation: fadeInUp 0.5s var(--ease-smooth) 0.1s both;
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(155,85,245,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  animation: fadeInUp 0.6s var(--ease-smooth) 0.15s both;
 }
 
 .auth-title {
@@ -134,7 +222,7 @@
   gap: var(--space-4);
 }
 
-/* ── OTP Input ── */
+/* ── OTP ── */
 .otp-inputs {
   display: flex;
   gap: var(--space-3);
@@ -143,28 +231,25 @@
 }
 
 .otp-input {
-  width: 52px;
-  height: 60px;
+  width: 52px; height: 60px;
   text-align: center;
   font-size: var(--text-xl);
   font-weight: 700;
-  background: var(--glass-light);
-  border: 2px solid var(--glass-border);
+  background: rgba(155,85,245,0.07);
+  border: 2px solid rgba(155,85,245,0.20);
   border-radius: var(--radius-md);
   color: var(--dark-text);
   transition: var(--transition-base);
   -webkit-appearance: none;
 }
-
 .otp-input:focus {
   border-color: var(--purple-400);
-  background: rgba(136,85,255,0.08);
-  box-shadow: 0 0 0 3px rgba(136,85,255,0.15);
+  background: rgba(155,85,245,0.12);
+  box-shadow: 0 0 0 3px rgba(155,85,245,0.18);
 }
-
 .otp-input.filled {
   border-color: var(--purple-300);
-  background: rgba(136,85,255,0.10);
+  background: rgba(155,85,245,0.14);
 }
 
 /* ── Divider ── */
@@ -176,7 +261,6 @@
   font-size: var(--text-xs);
   margin: var(--space-2) 0;
 }
-
 .auth-divider::before,
 .auth-divider::after {
   content: '';
@@ -185,16 +269,15 @@
   background: var(--dark-border);
 }
 
-/* ── Footer links ── */
+/* ── Footer ── */
 .auth-footer {
   text-align: center;
   margin-top: var(--space-5);
   font-size: var(--text-sm);
   color: var(--dark-subtext);
 }
-
 .auth-footer a {
-  color: var(--purple-400);
+  color: var(--purple-300);
   font-weight: 600;
 }
 
@@ -205,7 +288,6 @@
   padding-left: var(--space-1);
   animation: fadeInDown 0.2s ease;
 }
-
 .form-message {
   padding: 12px var(--space-4);
   border-radius: var(--radius-md);
@@ -214,34 +296,20 @@
   text-align: center;
   animation: fadeInScale 0.3s var(--ease-spring);
 }
-
 .form-message.error {
   background: rgba(248,113,113,0.12);
   border: 1px solid rgba(248,113,113,0.25);
   color: #f87171;
 }
-
 .form-message.success {
   background: rgba(52,211,153,0.10);
-  border: 1px solid rgba(52,211,153,0.2);
+  border: 1px solid rgba(52,211,153,0.20);
   color: #34d399;
 }
 
 /* ── Password strength ── */
-.password-strength {
-  display: flex;
-  gap: 4px;
-  margin-top: var(--space-2);
-}
-
-.strength-bar {
-  flex: 1;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background: var(--dark-border);
-  transition: var(--transition-base);
-}
-
-.strength-bar.weak   { background: #f87171; }
-.strength-bar.medium { background: #fbbf24; }
-.strength-bar.strong { background: #34d399; }
+.password-strength { display:flex; gap:4px; margin-top:var(--space-2); }
+.strength-bar { flex:1; height:4px; border-radius:var(--radius-full); background:var(--dark-border); transition:var(--transition-base); }
+.strength-bar.weak   { background:#f87171; }
+.strength-bar.medium { background:#fbbf24; }
+.strength-bar.strong { background:#34d399; }
