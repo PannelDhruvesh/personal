@@ -50,7 +50,7 @@
       <div class="settings-list" style="padding:0 16px;">
         <div class="settings-group">
           <div class="settings-item">
-            <div class="settings-item-icon">🌙</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9680;</div>
             <span class="settings-item-label">Dark Mode</span>
             <label class="toggle">
               <input type="checkbox" id="toggle-darkmode" checked />
@@ -58,7 +58,7 @@
             </label>
           </div>
           <div class="settings-item">
-            <div class="settings-item-icon">⊞</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9783;</div>
             <span class="settings-item-label">Grid Size</span>
             <div class="radio-group">
               <span class="radio-option" data-grid-size="small">S</span>
@@ -66,6 +66,24 @@
               <span class="radio-option" data-grid-size="large">L</span>
             </div>
           </div>
+
+          <!-- Background Image -->
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:12px;padding:16px 0;">
+            <div style="display:flex;align-items:center;gap:12px;width:100%;">
+              <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9635;</div>
+              <span class="settings-item-label">Background Image</span>
+            </div>
+            <div id="bg-preview" style="width:100%;height:100px;border-radius:14px;background:var(--dark-surface);border:1px dashed var(--dark-border);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer;" onclick="document.getElementById('bg-upload').click()">
+              <span id="bg-preview-text" style="color:var(--dark-muted);font-size:13px;">Tap to choose image</span>
+              <img id="bg-preview-img" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
+            </div>
+            <input type="file" id="bg-upload" accept="image/*" style="display:none;" />
+            <div style="display:flex;gap:8px;width:100%;">
+              <button id="apply-bg-btn" class="btn btn-primary" style="flex:1;padding:10px;font-size:13px;">Apply</button>
+              <button id="remove-bg-btn" class="btn btn-secondary" style="flex:1;padding:10px;font-size:13px;">Remove</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -74,7 +92,7 @@
       <div class="settings-list" style="padding:0 16px;">
         <div class="settings-group">
           <div class="settings-item">
-            <div class="settings-item-icon">👁</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9673;</div>
             <span class="settings-item-label">Show Hidden Albums</span>
             <label class="toggle">
               <input type="checkbox" id="toggle-hidden" />
@@ -82,7 +100,7 @@
             </label>
           </div>
           <div class="settings-item" id="change-password-btn" style="cursor:pointer;">
-            <div class="settings-item-icon">🔑</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9670;</div>
             <span class="settings-item-label">Change Password</span>
             <span class="settings-item-value">›</span>
           </div>
@@ -94,7 +112,7 @@
       <div class="settings-list" style="padding:0 16px;">
         <div class="settings-group">
           <div class="settings-item">
-            <div class="settings-item-icon">🔔</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9651;</div>
             <span class="settings-item-label">Notifications</span>
             <label class="toggle">
               <input type="checkbox" id="toggle-notifications" checked />
@@ -102,7 +120,7 @@
             </label>
           </div>
           <div class="settings-item">
-            <div class="settings-item-icon">☁️</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9652;</div>
             <span class="settings-item-label">Auto Backup</span>
             <label class="toggle">
               <input type="checkbox" id="toggle-backup" />
@@ -117,12 +135,12 @@
       <div class="settings-list" style="padding:0 16px;">
         <div class="settings-group">
           <div class="settings-item">
-            <div class="settings-item-icon">❤️</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9670;</div>
             <span class="settings-item-label">Its Billi</span>
             <span class="settings-item-value">v1.0.0</span>
           </div>
           <div class="settings-item">
-            <div class="settings-item-icon">🔐</div>
+            <div class="settings-item-icon" style="font-size:16px;color:var(--purple-400);">&#9671;</div>
             <span class="settings-item-label">Privacy Policy</span>
             <span class="settings-item-value">›</span>
           </div>
@@ -163,5 +181,71 @@
 
   <script src="config.js"></script>
   <script type="module" src="js/settings.js"></script>
+  <script>
+    // ── Background Image Logic ──
+    const bgUpload  = document.getElementById('bg-upload');
+    const bgPreview = document.getElementById('bg-preview-img');
+    const bgText    = document.getElementById('bg-preview-text');
+    const applyBtn  = document.getElementById('apply-bg-btn');
+    const removeBtn = document.getElementById('remove-bg-btn');
+
+    let pendingBg = null;
+
+    // Load saved bg
+    const savedBg = localStorage.getItem('app_bg_image');
+    if (savedBg) {
+      bgPreview.src = savedBg;
+      bgPreview.style.display = 'block';
+      bgText.style.display = 'none';
+      applyAppBg(savedBg);
+    }
+
+    bgUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        pendingBg = ev.target.result;
+        bgPreview.src = pendingBg;
+        bgPreview.style.display = 'block';
+        bgText.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    applyBtn.addEventListener('click', () => {
+      if (!pendingBg && !savedBg) return;
+      const bg = pendingBg || savedBg;
+      localStorage.setItem('app_bg_image', bg);
+      applyAppBg(bg);
+      pendingBg = null;
+      showMsg('Background applied!');
+    });
+
+    removeBtn.addEventListener('click', () => {
+      localStorage.removeItem('app_bg_image');
+      bgPreview.src = '';
+      bgPreview.style.display = 'none';
+      bgText.style.display = 'block';
+      pendingBg = null;
+      document.body.style.backgroundImage = 'none';
+      document.querySelector('.app-container')?.style && (document.querySelector('.app-container').style.backgroundImage = 'none');
+      showMsg('Background removed');
+    });
+
+    function applyAppBg(url) {
+      document.body.style.cssText += `background-image:url(${url});background-size:cover;background-position:center;background-attachment:fixed;`;
+      const app = document.getElementById('app');
+      if (app) app.style.background = 'transparent';
+    }
+
+    function showMsg(msg) {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(136,85,255,0.9);color:white;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:9999;backdrop-filter:blur(10px);';
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
+    }
+  </script>
 </body>
 </html>

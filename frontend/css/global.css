@@ -8,6 +8,9 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 #app, .app-container {
@@ -16,8 +19,25 @@ body {
   min-height: 100dvh;
   margin: 0 auto;
   position: relative;
-  background: var(--dark-bg);
+  background: transparent;
   overflow: hidden;
+}
+
+/* Background overlay for all pages */
+#app::before, .app-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--app-bg-overlay);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+body.has-bg #app::before,
+body.has-bg .app-container::before {
+  opacity: 1;
 }
 
 /* ── Page Wrapper ── */

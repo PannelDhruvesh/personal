@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0d0d0d" />
-  <title>Sign In — Its Billi ❤️</title>
+  <meta name="theme-color" content="#080810" />
+  <title>Sign In — Its Billi</title>
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/global.css" />
@@ -13,19 +13,20 @@
 </head>
 <body>
   <div id="app">
-    <div class="auth-page">
+    <div class="auth-page" id="auth-page">
+      <div class="auth-bg-orb"></div>
       <div class="auth-inner">
 
         <!-- Logo -->
         <div class="auth-logo">
-          <div class="auth-logo-icon">❤️</div>
+          <div class="auth-logo-icon">IB</div>
           <h1 class="auth-logo-title">Its Billi</h1>
           <p class="auth-logo-sub">Your private memory space</p>
         </div>
 
         <!-- Card -->
         <div class="auth-card">
-          <h2 class="auth-title">Welcome back 👋</h2>
+          <h2 class="auth-title">Welcome back</h2>
           <p class="auth-subtitle">Sign in to access your memories</p>
 
           <div id="form-message" class="form-message" style="display:none;"></div>
@@ -35,7 +36,7 @@
             <div class="input-group">
               <label class="input-label" for="email">Email</label>
               <div class="input-wrapper">
-                <span class="input-icon">📧</span>
+                <span class="input-icon" style="font-style:normal;font-size:14px;color:var(--purple-400);">@</span>
                 <input type="email" id="email" name="email" class="input-field"
                   placeholder="your@email.com" autocomplete="email" required />
               </div>
@@ -44,21 +45,21 @@
             <div class="input-group">
               <label class="input-label" for="password">Password</label>
               <div class="input-wrapper">
-                <span class="input-icon">🔒</span>
+                <span class="input-icon" style="font-style:normal;font-size:14px;color:var(--purple-400);">*</span>
                 <input type="password" id="password" name="password" class="input-field"
                   placeholder="Your password" autocomplete="current-password" required />
-                <span class="input-icon-right" id="toggle-password">👁️</span>
+                <span class="input-icon-right" id="toggle-password" style="font-size:13px;color:var(--purple-400);font-weight:600;letter-spacing:1px;">SHOW</span>
               </div>
             </div>
 
             <div style="text-align:right;margin-top:-8px;">
-              <a href="/forgot-password.html" style="font-size:var(--text-sm);color:var(--pink-400);font-weight:500;">
+              <a href="/forgot-password.html" style="font-size:var(--text-sm);color:var(--purple-400);font-weight:500;">
                 Forgot password?
               </a>
             </div>
 
             <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
-              ✨ Sign In
+              Sign In
             </button>
 
           </form>
@@ -67,7 +68,7 @@
 
           <div class="auth-footer">
             Don't have an account?
-            <a href="/register.html"> Create one ❤️</a>
+            <a href="/register.html">Create one</a>
           </div>
         </div>
 
@@ -77,5 +78,12 @@
 
   <script src="config.js"></script>
   <script type="module" src="js/login.js"></script>
+  <script>
+    // Apply saved background on load
+    const savedBg = localStorage.getItem('app_bg_image');
+    if (savedBg) {
+      document.getElementById('auth-page').style.backgroundImage = `url(${savedBg})`;
+    }
+  </script>
 </body>
 </html>
