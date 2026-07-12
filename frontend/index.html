@@ -11,7 +11,10 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #0d0d0d;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, #3d0e7a 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, #5e1ab8 0%, transparent 55%),
+        #04020f;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       display: flex;
       align-items: center;
@@ -43,19 +46,19 @@
     }
     .orb-1 {
       width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(233,30,140,0.35) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(124,45,232,0.45) 0%, transparent 70%);
       top: -80px; right: -60px;
       animation: float 7s ease-in-out infinite;
     }
     .orb-2 {
       width: 250px; height: 250px;
-      background: radial-gradient(circle, rgba(124,58,237,0.30) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(90,26,184,0.35) 0%, transparent 70%);
       bottom: 50px; left: -60px;
       animation: float 9s ease-in-out infinite reverse;
     }
     .orb-3 {
       width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(233,30,140,0.20) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(155,85,245,0.25) 0%, transparent 70%);
       bottom: 30%; right: 10%;
       animation: float 5s ease-in-out infinite 2s;
     }
@@ -71,14 +74,14 @@
     .logo-icon {
       width: 110px;
       height: 110px;
-      background: linear-gradient(135deg, #e91e8c 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #9b55f5 0%, #5e1ab8 100%);
       border-radius: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 24px;
       font-size: 54px;
-      box-shadow: 0 12px 48px rgba(233,30,140,0.55), 0 0 80px rgba(233,30,140,0.25);
+      box-shadow: 0 12px 48px rgba(124,45,232,0.55), 0 0 80px rgba(124,45,232,0.25);
       animation: glowPulse 2.5s ease-in-out infinite 1s;
     }
 
@@ -86,7 +89,7 @@
       font-size: 2.4rem;
       font-weight: 900;
       letter-spacing: -1px;
-      background: linear-gradient(135deg, #e91e8c, #ff85bb, #9966ff);
+      background: linear-gradient(135deg, #9b55f5, #d0aaff, #7c2de8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -131,7 +134,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #e91e8c, #7c3aed);
+      background: linear-gradient(135deg, #9b55f5, #5e1ab8);
       animation: dotPulse 1.4s ease-in-out infinite;
     }
     .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -155,13 +158,13 @@
     }
 
     @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 12px 48px rgba(233,30,140,0.55), 0 0 80px rgba(233,30,140,0.25); }
-      50%       { box-shadow: 0 12px 64px rgba(233,30,140,0.75), 0 0 100px rgba(233,30,140,0.4); }
+      0%, 100% { box-shadow: 0 12px 48px rgba(124,45,232,0.55), 0 0 80px rgba(124,45,232,0.25); }
+      50%       { box-shadow: 0 12px 64px rgba(124,45,232,0.75), 0 0 100px rgba(124,45,232,0.4); }
     }
 
     @keyframes glowText {
       0%, 100% { filter: brightness(1); }
-      50%       { filter: brightness(1.2) drop-shadow(0 0 12px rgba(233,30,140,0.6)); }
+      50%       { filter: brightness(1.2) drop-shadow(0 0 12px rgba(155,85,245,0.6)); }
     }
 
     @keyframes fadeIn {
@@ -187,9 +190,9 @@
 
     <!-- Logo -->
     <div class="splash-logo">
-      <div class="logo-icon">❤️</div>
+      <div class="logo-icon" style="font-size:32px;font-weight:900;color:white;letter-spacing:-1px;">IB</div>
       <h1 class="logo-title">Its Billi</h1>
-      <p class="logo-tagline">Your private memories ✨</p>
+      <p class="logo-tagline">Your private memory space</p>
     </div>
 
     <!-- Loading indicator -->
@@ -201,18 +204,22 @@
   </div>
 
   <script>
-    // Spawn heart particles
-    const emojis = ['❤️','💕','🌸','✨','💖','🌺','💗','⭐','💝'];
+    // Spawn star particles (no emoji)
     const container = document.getElementById('particles');
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 20; i++) {
       const p = document.createElement('div');
-      p.className = 'particle';
-      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      p.style.left   = Math.random() * 100 + '%';
-      p.style.bottom = Math.random() * 60 + '%';
-      p.style.animationDuration = (3 + Math.random() * 5) + 's';
-      p.style.animationDelay    = (Math.random() * 4) + 's';
-      p.style.fontSize           = (14 + Math.random() * 16) + 'px';
+      p.style.cssText = `
+        position:absolute;
+        width:${2 + Math.random()*3}px;
+        height:${2 + Math.random()*3}px;
+        border-radius:50%;
+        background:rgba(${155+Math.random()*100},${85+Math.random()*80},255,${0.4+Math.random()*0.6});
+        left:${Math.random()*100}%;
+        bottom:${Math.random()*60}%;
+        animation:particleFloat ${3+Math.random()*5}s linear infinite;
+        animation-delay:${Math.random()*4}s;
+        opacity:0;
+      `;
       container.appendChild(p);
     }
 

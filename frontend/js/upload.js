@@ -163,7 +163,7 @@ async function startUpload() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      if (selectedAlbumId) formData.append('album_id', selectedAlbumId);
+      if (selectedAlbumId && selectedAlbumId !== 'null') formData.append('album_id', selectedAlbumId);
 
       await api.uploadFile(formData);
 
