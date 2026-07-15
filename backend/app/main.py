@@ -9,6 +9,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from app.config import settings
 from app.middleware.logger import RequestLoggerMiddleware
 from app.routers import auth, users, albums, uploads, gallery, download, settings as settings_router, admin
+from app.routers import google_auth
 
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -40,6 +41,7 @@ app.add_middleware(RequestLoggerMiddleware)
 
 # Routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(google_auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(albums.router, prefix="/api/v1")
 app.include_router(uploads.router, prefix="/api/v1")
