@@ -1,10 +1,10 @@
 /* ── Upload Page ── */
 .upload-zone {
-  border: 2px dashed var(--pink-500);
+  border: 2px dashed var(--purple-400);
   border-radius: var(--radius-xl);
   padding: var(--space-10) var(--space-5);
   text-align: center;
-  background: rgba(233,30,140,0.04);
+  background: rgba(155,85,245,0.04);
   transition: var(--transition-base);
   cursor: pointer;
   position: relative;
@@ -12,9 +12,9 @@
 }
 
 .upload-zone.drag-over {
-  border-color: var(--purple-400);
-  background: rgba(124,58,237,0.10);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+  border-color: var(--purple-300);
+  background: rgba(155,85,245,0.10);
+  box-shadow: 0 0 0 4px rgba(155,85,245,0.15);
   transform: scale(1.01);
 }
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0d0d0d" />
-  <title>Upload — Its Billi ❤️</title>
+  <meta name="theme-color" content="#04020f" />
+  <title>Upload — Its Billi</title>
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/global.css" />
@@ -32,9 +32,9 @@
       <div class="upload-zone" id="upload-zone">
         <input type="file" id="file-input" multiple
           accept="image/*,video/mp4,video/quicktime,video/webm,video/x-msvideo" />
-        <div class="upload-zone-icon">📤</div>
+        <div class="upload-zone-icon" style="font-size:40px;color:var(--purple-400);font-weight:900;">+</div>
         <p class="upload-zone-title">Drop files here</p>
-        <p class="upload-zone-sub">or tap to browse<br/>Photos & Videos · Max 100MB each · Up to 20 files</p>
+        <p class="upload-zone-sub">or tap to browse<br/>Photos &amp; Videos · Max 100MB · Up to 20 files</p>
       </div>
 
       <!-- Album selector -->
@@ -65,8 +65,8 @@
 
     <!-- Album picker bottom sheet -->
     <div id="album-sheet-backdrop"
-      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:250;backdrop-filter:blur(6px);"
-      onclick="document.getElementById('album-sheet-backdrop').style.display='none';document.getElementById('album-sheet').classList.remove('open');"></div>
+      style="visibility:hidden;opacity:0;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:250;transition:opacity 0.2s,visibility 0.2s;"
+      onclick="closeSheet();"></div>
 
     <div id="album-sheet" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--dark-surface);border-radius:28px 28px 0 0;z-index:260;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);border-top:1px solid var(--dark-border);">
       <div style="padding:12px 20px 8px;">
@@ -104,13 +104,19 @@
   </style>
 
   <script>
-    // Show backdrop when sheet opens
-    const sheet = document.getElementById('album-sheet');
-    const backdrop = document.getElementById('album-sheet-backdrop');
-    const observer = new MutationObserver(() => {
-      backdrop.style.display = sheet.classList.contains('open') ? 'block' : 'none';
-    });
-    observer.observe(sheet, { attributes: true, attributeFilter: ['class'] });
+    function openSheet() {
+      document.getElementById('album-sheet').style.transform = 'translateX(-50%) translateY(0)';
+      const b = document.getElementById('album-sheet-backdrop');
+      b.style.visibility = 'visible';
+      b.style.opacity = '1';
+    }
+    function closeSheet() {
+      document.getElementById('album-sheet').style.transform = 'translateX(-50%) translateY(100%)';
+      const b = document.getElementById('album-sheet-backdrop');
+      b.style.opacity = '0';
+      setTimeout(() => b.style.visibility = 'hidden', 200);
+    }
+    window.closeAlbumSheet = closeSheet;
   </script>
 
   <script src="config.js"></script>

@@ -51,11 +51,13 @@ window.selectAlbum = function(id, name) {
 };
 
 albumSelect?.addEventListener('click', () => {
-  albumSheet.classList.add('open');
+  if (typeof openSheet === 'function') openSheet();
+  else albumSheet.classList.add('open');
 });
 
 function closeAlbumSheet() {
-  albumSheet.classList.remove('open');
+  if (typeof closeSheet === 'function') closeSheet();
+  else albumSheet.classList.remove('open');
 }
 
 document.getElementById('album-sheet-backdrop')?.addEventListener('click', closeAlbumSheet);
