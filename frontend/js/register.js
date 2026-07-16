@@ -146,11 +146,17 @@ document.getElementById('verify-btn')?.addEventListener('click', async () => {
   }
 });
 
-document.getElementById('resend-btn')?.addEventListener('click', async () => {
+document.getElementById('resend-btn')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  if (!registeredEmail) return;
+  const btn = document.getElementById('resend-btn');
+  btn.textContent = 'Sending...';
   try {
-    await api.forgotPassword(registeredEmail);
-    toast.success('New code sent!');
+    await api.resendOtp(registeredEmail);
+    toast.success('New code sent to your email!');
   } catch (_) {
     toast.error('Could not resend. Try again.');
+  } finally {
+    btn.textContent = 'Resend code';
   }
 });

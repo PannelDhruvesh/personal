@@ -371,16 +371,17 @@ async def list_all_files(
 
 def _log_activity(db: Session, user_id, action: str,
                   resource_type: str = None, resource_id=None, details: dict = None):
+    import json
     try:
         db.execute(
             text("""INSERT INTO activity_logs (user_id, action, resource_type, resource_id, details)
-               VALUES (:uid, :action, :rtype, :rid, :details)"""),
+               VALUES (:uid, :action, :rtype, :rid, :details::jsonb)"""),
             {
                 "uid": str(user_id),
                 "action": action,
                 "rtype": resource_type,
                 "rid": str(resource_id) if resource_id else None,
-                "details": str(details or {}).replace("'", '"')
+                "details": json.dumps(details or {})
             }
         )
         db.commit()

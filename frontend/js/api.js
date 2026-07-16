@@ -118,6 +118,7 @@ class ApiClient {
   login(data)              { return this.post('/auth/login', data); }
   logout(refreshToken)     { return this.post('/auth/logout', { refresh_token: refreshToken }); }
   verifyOtp(data)          { return this.post('/auth/verify-otp', data); }
+  resendOtp(email)         { return this.post('/auth/resend-otp', { email }); }
   forgotPassword(email)    { return this.post('/auth/forgot-password', { email }); }
   resetPassword(data)      { return this.post('/auth/reset-password', data); }
   googleLogin(idToken)     { return this.post('/auth/google', { id_token: idToken }); }

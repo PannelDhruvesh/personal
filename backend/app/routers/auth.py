@@ -1,9 +1,13 @@
 import random
 import string
+import logging
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 from app.database import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -14,13 +18,15 @@ from app.schemas.auth import (
 from app.auth.hashing import hash_password, verify_password
 from app.auth.jwt_handler import create_access_token, create_refresh_token
 from app.config import settings
-from app.utils.response import success_response, error_response
+from app.utils.response import success_response
 import uuid
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+logger = logging.getLogger("its_billi")
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 def generate_otp() -> str:
@@ -64,8 +70,8 @@ async def send_otp_email(email: str, otp: str, otp_type: str):
             use_tls=False,
             start_tls=True
         )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to send OTP email to {email}: {e}")
 
 
 @router.post("/register")
@@ -109,17 +115,32 @@ async def register(data: RegisterRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/verify-otp")
-async def verify_otp(data: VerifyOTPRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def verify_otp(request: Request, data: VerifyOTPRequest, db: Session = Depends(get_db)):
+    # Check attempts — max 5 tries per OTP
     result = db.execute(
         text("""SELECT * FROM otp_verifications
-           WHERE email = :email AND otp_code = :otp AND otp_type = :type
+           WHERE email = :email AND otp_type = :type
            AND is_used = FALSE AND expires_at > NOW()
            ORDER BY created_at DESC LIMIT 1"""),
-        {"email": data.email, "otp": data.otp_code, "type": data.otp_type}
+        {"email": data.email, "type": data.otp_type}
     ).fetchone()
 
     if not result:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    if result.attempts >= 5:
+        raise HTTPException(status_code=429, detail="Too many attempts. Request a new code.")
+
+    # Increment attempts
+    db.execute(
+        text("UPDATE otp_verifications SET attempts = attempts + 1 WHERE id = :id"),
+        {"id": result.id}
+    )
+    db.commit()
+
+    if result.otp_code != data.otp_code:
+        raise HTTPException(status_code=400, detail="Invalid OTP code")
 
     db.execute(
         text("UPDATE otp_verifications SET is_used = TRUE WHERE id = :id"),
@@ -137,10 +158,12 @@ async def verify_otp(data: VerifyOTPRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=None)
-async def login(data: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def login(request: Request, data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email, User.is_active == True).first()
 
     if not user or not verify_password(data.password, user.password_hash):
+        logger.warning(f"Failed login attempt for email: {data.email}")
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     if not user.is_verified:
@@ -215,8 +238,31 @@ async def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     return success_response(message="Logged out successfully")
 
 
+@router.post("/resend-otp")
+@limiter.limit("3/minute")
+async def resend_otp(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Resend OTP for email verification during registration."""
+    user = db.query(User).filter(User.email == data.email, User.is_verified == False).first()
+    if user:
+        otp = generate_otp()
+        expires = datetime.now(timezone.utc) + timedelta(minutes=10)
+        # Invalidate previous unused OTPs
+        db.execute(
+            text("UPDATE otp_verifications SET is_used = TRUE WHERE email = :email AND otp_type = 'register' AND is_used = FALSE"),
+            {"email": data.email}
+        )
+        db.execute(
+            text("INSERT INTO otp_verifications (user_id, email, otp_code, otp_type, expires_at) VALUES (:uid, :email, :otp, 'register', :exp)"),
+            {"uid": str(user.id), "email": data.email, "otp": otp, "exp": expires}
+        )
+        db.commit()
+        await send_otp_email(data.email, otp, "register")
+    return success_response(message="If this account exists and is unverified, a new code has been sent.")
+
+
 @router.post("/forgot-password")
-async def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def forgot_password(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     if user:
         otp = generate_otp()
@@ -232,7 +278,8 @@ async def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get
 
 
 @router.post("/reset-password")
-async def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def reset_password(request: Request, data: ResetPasswordRequest, db: Session = Depends(get_db)):
     result = db.execute(
         text("""SELECT * FROM otp_verifications
            WHERE email = :email AND otp_code = :otp AND otp_type = 'reset_password'

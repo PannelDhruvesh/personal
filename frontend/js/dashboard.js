@@ -12,6 +12,14 @@ async function init() {
   await Promise.all([loadStorageStats(), loadRecentFiles(), loadAlbums()]);
 }
 
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
 function renderUserInfo(u) {
   const nameEl = document.getElementById('greeting-name');
   const avatarEl = document.getElementById('user-avatar');
@@ -19,7 +27,12 @@ function renderUserInfo(u) {
   if (nameEl) nameEl.textContent = u?.display_name || u?.username || 'Friend';
   if (avatarEl) {
     if (u?.avatar_url) {
-      avatarEl.innerHTML = `<img src="${u.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      const img = document.createElement('img');
+      img.src = u.avatar_url;
+      img.alt = 'avatar';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      avatarEl.innerHTML = '';
+      avatarEl.appendChild(img);
     } else {
       avatarEl.textContent = getInitials(u?.display_name || u?.username || '?');
     }
@@ -61,11 +74,11 @@ async function loadRecentFiles() {
     }
 
     container.innerHTML = files.map(f => `
-      <div class="recent-thumb" onclick="openViewer('${f.id}', '${f.file_type}', '${f.signed_url}')">
+      <div class="recent-thumb" onclick="openViewer('${esc(f.id)}', '${esc(f.file_type)}', '${esc(f.signed_url)}')">
         ${f.file_type === 'photo'
-          ? `<img src="${f.signed_url}" alt="${f.original_filename}" loading="lazy" />`
-          : `<video src="${f.signed_url}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
-             <span class="recent-video-badge">▶</span>`
+          ? `<img src="${esc(f.signed_url)}" alt="${esc(f.original_filename)}" loading="lazy" />`
+          : `<video src="${esc(f.signed_url)}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+             <span class="recent-video-badge">&#9654;</span>`
         }
       </div>
     `).join('');

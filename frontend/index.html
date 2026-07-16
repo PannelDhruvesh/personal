@@ -71,18 +71,18 @@
       animation: bounceIn 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .logo-icon {
-      width: 110px;
-      height: 110px;
-      background: linear-gradient(135deg, #9b55f5 0%, #5e1ab8 100%);
-      border-radius: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 54px;
-      box-shadow: 0 12px 48px rgba(124,45,232,0.55), 0 0 80px rgba(124,45,232,0.25);
-      animation: glowPulse 2.5s ease-in-out infinite 1s;
+    .logo-icon { 
+      width: 110px; 
+      height: 110px; 
+      background: linear-gradient(135deg, #9b55f5 0%, #5e1ab8 100%); 
+      border-radius: 34px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;  
+      margin: 0 auto 24px; 
+      font-size: 54px; 
+      box-shadow: 0 12px 48px rgba(124,45,232,0.55), 0 0 80px rgba(124,45,232,0.25); 
+      animation: glowPulse 2.5s ease-in-out infinite 1s; 
     }
 
     .logo-title {
@@ -219,15 +219,15 @@
         animation:particleFloat ${3+Math.random()*5}s linear infinite;
         animation-delay:${Math.random()*4}s;
         opacity:0;
-      `;
-      container.appendChild(p);
-    }
+      `; 
+      container.appendChild(p); 
+    } 
 
-    // Redirect after splash
-    setTimeout(() => {
-      const token = localStorage.getItem('access_token');
-      window.location.replace(token ? '/dashboard.html' : '/login.html');
-    }, 2400);
-  </script>
-</body>
-</html>
+    // Redirect after splash 
+    setTimeout(() => { 
+      const token = localStorage.getItem('access_token'); 
+      window.location.replace(token ? '/dashboard.html' : '/login.html'); 
+    }, 2400);  
+  </script>  
+</body> 
+</html>    

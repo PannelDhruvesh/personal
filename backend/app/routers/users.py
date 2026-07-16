@@ -4,7 +4,8 @@ from sqlalchemy import text
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.user import UserResponse, UpdateProfileRequest, ChangePasswordRequest, UpdateSettingsRequest
+from app.schemas.user import (UserResponse, UpdateProfileRequest, ChangePasswordRequest,
+                               UpdateSettingsRequest, ALLOWED_SETTINGS_FIELDS)
 from app.auth.hashing import hash_password, verify_password
 from app.services.storage import upload_file_to_storage, generate_signed_url
 from app.utils.response import success_response
@@ -16,12 +17,17 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
+    # Generate signed URL for avatar if it's a storage path
+    avatar_url = current_user.avatar_url
+    if avatar_url and not avatar_url.startswith("http"):
+        avatar_url = generate_signed_url(avatar_url, expires_in=86400) or avatar_url
+
     return success_response(data={
         "id": str(current_user.id),
         "email": current_user.email,
         "username": current_user.username,
         "display_name": current_user.display_name,
-        "avatar_url": current_user.avatar_url,
+        "avatar_url": avatar_url,
         "bio": current_user.bio,
         "is_verified": current_user.is_verified,
         "is_admin": current_user.is_admin,
@@ -126,11 +132,16 @@ async def update_settings(
     if not update_fields:
         return success_response(message="No changes")
 
-    set_clause = ", ".join([f"{k} = :{k}" for k in update_fields.keys()])
-    update_fields["uid"] = str(current_user.id)
+    # Enforce allowlist to prevent SQL injection via field names
+    safe_fields = {k: v for k, v in update_fields.items() if k in ALLOWED_SETTINGS_FIELDS}
+    if not safe_fields:
+        return success_response(message="No valid fields to update")
+
+    set_clause = ", ".join([f"{k} = :{k}" for k in safe_fields.keys()])
+    safe_fields["uid"] = str(current_user.id)
     db.execute(
         text(f"UPDATE user_settings SET {set_clause}, updated_at = NOW() WHERE user_id = :uid"),
-        update_fields
+        safe_fields
     )
     db.commit()
     return success_response(message="Settings updated")
