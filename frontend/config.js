@@ -1,7 +1,7 @@
 // ── App Configuration ──
 window.APP_CONFIG = {
   API_URL: 'https://personal-awj6.onrender.com/api/v1',
-  GOOGLE_CLIENT_ID: '458568704116-your-client-id.apps.googleusercontent.com', // Replace with your Google Client ID
+  GOOGLE_CLIENT_ID: '477159683903-hr9f9mh61puotl7qkbhd507sgdjhhhln.apps.googleusercontent.com',
 };
 
 // ── Apply saved background image on every page ──
