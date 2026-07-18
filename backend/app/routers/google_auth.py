@@ -116,6 +116,7 @@ async def google_login(data: GoogleTokenRequest, db: Session = Depends(get_db)):
             "email": user.email,
             "username": user.username,
             "display_name": user.display_name,
-            "avatar_url": user.avatar_url
+            "avatar_url": user.avatar_url,
+            "is_admin": bool(user.is_admin)
         }
     })

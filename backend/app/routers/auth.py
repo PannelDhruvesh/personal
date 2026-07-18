@@ -202,7 +202,8 @@ async def login(request: Request, data: LoginRequest, db: Session = Depends(get_
             "email": user.email,
             "username": user.username,
             "display_name": user.display_name,
-            "avatar_url": user.avatar_url
+            "avatar_url": user.avatar_url,
+            "is_admin": bool(user.is_admin)
         }
     })
 
