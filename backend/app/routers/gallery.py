@@ -47,8 +47,14 @@ async def get_gallery(
         query = query.filter(File.file_type == file_type)
     if favorites_only:
         query = query.filter(File.is_favorite == True)
-    if album_id:
-        query = query.filter(File.album_id == album_id)
+    # Only filter by album_id if it's a valid non-null UUID string
+    if album_id and album_id.lower() not in ("null", "undefined", "none", ""):
+        import uuid as _uuid
+        try:
+            _uuid.UUID(album_id)
+            query = query.filter(File.album_id == album_id)
+        except ValueError:
+            pass  # invalid UUID — ignore filter
 
     total = query.count()
     files = query.order_by(File.created_at.desc()).offset((page - 1) * limit).limit(limit).all()

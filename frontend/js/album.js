@@ -37,7 +37,11 @@ async function loadFiles(reset = false) {
   isLoading = true;
 
   try {
-    const res = await api.getGallery({ album_id: albumId, page, limit: 30 });
+    const params = { page, limit: 30 };
+    if (albumId && albumId !== 'null' && albumId !== 'undefined') {
+      params.album_id = albumId;
+    }
+    const res = await api.getGallery(params);
     const files = res.data;
     const pagination = res.pagination;
 
