@@ -30,20 +30,17 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-# CORS — never use wildcard with credentials
+# CORS — allow all origins but keep credentials safe
+# In production, update ALLOWED_ORIGINS env var to your specific domain
 _allowed_origins = settings.allowed_origins_list
+# If wildcard configured, still need explicit origins for credentials to work
 if "*" in _allowed_origins:
-    _allowed_origins = [
-        "https://its-billi.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-    ]
+    _allowed_origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
-    allow_credentials=True,
+    allow_origins=_allowed_origins if "*" not in _allowed_origins else ["*"],
+    allow_credentials=False if "*" in _allowed_origins else True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
 )
