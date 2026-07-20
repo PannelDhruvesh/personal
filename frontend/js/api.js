@@ -58,7 +58,21 @@ class ApiClient {
       headers['Content-Type'] = 'application/json';
     }
 
-    let response = await fetch(url, { ...options, headers });
+    // Show wake-up indicator on first request if server might be sleeping
+    const wakeEl = document.getElementById('server-wake-toast');
+
+    let response;
+    try {
+      response = await fetch(url, { ...options, headers });
+    } catch (networkErr) {
+      // Likely Render cold start — retry once after delay
+      if (wakeEl) { wakeEl.style.display = 'flex'; }
+      await new Promise(r => setTimeout(r, 3000));
+      response = await fetch(url, { ...options, headers });
+      if (wakeEl) { wakeEl.style.display = 'none'; }
+    }
+
+    if (wakeEl) { wakeEl.style.display = 'none'; }
 
     // Token expired → try refresh once
     if (response.status === 401 && token) {
