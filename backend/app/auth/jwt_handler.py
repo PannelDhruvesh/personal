@@ -38,16 +38,3 @@ def verify_access_token(token: str) -> Optional[Dict[str, Any]]:
         return payload
     except JWTError:
         return None
-
-
-def decode_token_without_verification(token: str) -> Optional[Dict[str, Any]]:
-    try:
-        payload = jwt.decode(
-            token,
-            settings.JWT_SECRET_KEY,
-            algorithms=[settings.JWT_ALGORITHM],
-            options={"verify_exp": False}
-        )
-        return payload
-    except JWTError:
-        return None

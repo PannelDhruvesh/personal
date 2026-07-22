@@ -220,9 +220,24 @@ def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     if not result:
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
+    # Rotate: revoke old token, issue new one
     new_access_token = create_access_token({"sub": str(result.uid), "email": result.email})
+    new_refresh_token = create_refresh_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+
+    db.execute(
+        text("UPDATE refresh_tokens SET is_revoked = TRUE WHERE token = :token"),
+        {"token": data.refresh_token}
+    )
+    db.execute(
+        text("INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (:uid, :token, :exp)"),
+        {"uid": str(result.uid), "token": new_refresh_token, "exp": expires_at}
+    )
+    db.commit()
+
     return success_response(data={
         "access_token": new_access_token,
+        "refresh_token": new_refresh_token,
         "token_type": "bearer",
         "expires_in": settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
     })

@@ -44,7 +44,7 @@ class ApiClient {
     }
 
     const data = await res.json();
-    this.setTokens(data.data.access_token, null);
+    this.setTokens(data.data.access_token, data.data.refresh_token || null);
     return data.data.access_token;
   }
 

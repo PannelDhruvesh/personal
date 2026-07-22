@@ -20,10 +20,11 @@ class GoogleTokenRequest(BaseModel):
 
 
 async def verify_google_token(id_token: str) -> dict:
-    """Verify Google ID token and validate aud claim."""
+    """Verify Google ID token via tokeninfo endpoint with full claim validation."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         resp = await client.get(
-            f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
+            "https://oauth2.googleapis.com/tokeninfo",
+            params={"id_token": id_token}
         )
     if resp.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid Google token")
@@ -32,10 +33,21 @@ async def verify_google_token(id_token: str) -> dict:
     if "error" in data:
         raise HTTPException(status_code=401, detail="Invalid Google token")
 
-    # Validate audience — token must be issued for OUR app
+    # Validate audience
     token_aud = data.get("aud", "")
     if settings.GOOGLE_CLIENT_ID and token_aud != settings.GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=401, detail="Token audience mismatch")
+
+    # Validate issuer — must be Google
+    token_iss = data.get("iss", "")
+    if token_iss not in ("https://accounts.google.com", "accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Invalid token issuer")
+
+    # Validate expiry
+    import time
+    exp = data.get("exp")
+    if exp and int(exp) < int(time.time()):
+        raise HTTPException(status_code=401, detail="Google token has expired")
 
     # Validate email is verified by Google
     if data.get("email_verified") not in ("true", True):
