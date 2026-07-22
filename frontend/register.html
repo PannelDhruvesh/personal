@@ -139,25 +139,46 @@
 
   <script src="config.js"></script>
   <script>
-    (function(){const f=document.getElementById('star-field');if(!f)return;for(let i=0;i<150;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2.5+0.5,x=Math.random()*100,y=Math.random()*100,d=(Math.random()*4+2).toFixed(1),dl=(Math.random()*5).toFixed(1),op=(Math.random()*0.6+0.2).toFixed(2);s.style.cssText=`width:${sz}px;height:${sz}px;left:${x}%;top:${y}%;opacity:${op};--dur:${d}s;--delay:${dl}s;`;f.appendChild(s);}})();
-
-    // Google button
-    document.getElementById('google-btn')?.addEventListener('click', () => {
-      const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
-      if (!clientId || clientId.includes('your-client-id')) {
-        alert('Google Sign-In not configured yet. Please add your Google Client ID to config.js');
-        return;
+    // Star field
+    (function() {
+      var f = document.getElementById('star-field');
+      if (!f) return;
+      for (var i = 0; i < 150; i++) {
+        var s = document.createElement('div');
+        s.className = 'star';
+        var sz = (Math.random() * 2.5 + 0.5).toFixed(1);
+        var x  = (Math.random() * 100).toFixed(1);
+        var y  = (Math.random() * 100).toFixed(1);
+        var d  = (Math.random() * 4 + 2).toFixed(1);
+        var dl = (Math.random() * 5).toFixed(1);
+        var op = (Math.random() * 0.6 + 0.2).toFixed(2);
+        s.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;left:' + x + '%;top:' + y + '%;opacity:' + op + ';--dur:' + d + 's;--delay:' + dl + 's;';
+        f.appendChild(s);
       }
-      if (typeof google === 'undefined') { alert('Google loading, try again.'); return; }
-      google.accounts.id.initialize({ client_id: clientId, callback: async (resp) => {
-        try {
-          const { api } = await import('./js/api.js');
-          const res = await api.googleLogin(resp.credential);
-          api.setTokens(res.data.access_token, res.data.refresh_token);
-          localStorage.setItem('user', JSON.stringify(res.data.user));
-          window.location.replace('/dashboard.html');
-        } catch(e) { alert('Google sign-in failed: ' + e.message); }
-      }, auto_select: false });
+    })();
+
+    // Google button for register page
+    document.getElementById('google-btn') && document.getElementById('google-btn').addEventListener('click', function() {
+      var clientId = window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID;
+      if (!clientId) { alert('Google Sign-In not configured.'); return; }
+      if (typeof google === 'undefined') { alert('Google is loading, please try again.'); return; }
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: function(resp) {
+          import('./js/api.js').then(function(m) {
+            return m.api.googleLogin(resp.credential);
+          }).then(function(res) {
+            var a = res.data;
+            localStorage.setItem('access_token', a.access_token);
+            localStorage.setItem('refresh_token', a.refresh_token);
+            localStorage.setItem('user', JSON.stringify(a.user));
+            window.location.replace('/dashboard.html');
+          }).catch(function(e) {
+            alert('Google sign-in failed: ' + (e.message || e));
+          });
+        },
+        auto_select: false
+      });
       google.accounts.id.prompt();
     });
   </script>
