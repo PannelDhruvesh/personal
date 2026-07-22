@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/login.css" />
-  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client"></script>
 </head>
 <body style="background:#04020f;">
@@ -26,23 +25,19 @@
 
       <div class="auth-inner">
 
-        <!-- Logo -->
         <div class="auth-logo">
           <div class="auth-logo-icon">IB</div>
           <h1 class="auth-logo-title">Its Billi</h1>
           <p class="auth-logo-sub">Your private memory space</p>
         </div>
 
-        <!-- Card -->
         <div class="auth-card">
           <h2 class="auth-title">Welcome back</h2>
           <p class="auth-subtitle">Sign in to access your memories</p>
 
           <div id="form-message" class="form-message" style="display:none;"></div>
 
-          <!-- Email/Password form -->
           <form id="login-form" class="auth-form" autocomplete="on" novalidate>
-
             <div class="input-group">
               <label class="input-label" for="email">Email</label>
               <div class="input-wrapper">
@@ -64,45 +59,21 @@
             </div>
 
             <div style="text-align:right;margin-top:-8px;">
-              <a href="/forgot-password.html" style="font-size:var(--text-sm);color:var(--purple-300);font-weight:500;">
-                Forgot password?
-              </a>
+              <a href="/forgot-password.html" style="font-size:var(--text-sm);color:var(--purple-300);font-weight:500;">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn btn-primary btn-full" id="submit-btn">Sign In</button>
-
           </form>
 
-          <!-- Divider -->
           <div class="auth-divider">or</div>
 
-          <!-- Custom Google button matching app design -->
-          <button id="google-btn" type="button" style="
-            width:100%;padding:13px 16px;
-            border-radius:var(--radius-lg);
-            background:rgba(255,255,255,0.07);
-            border:1.5px solid rgba(155,85,245,0.25);
-            color:var(--dark-text);
-            font-size:var(--text-sm);font-weight:600;
-            display:flex;align-items:center;justify-content:center;gap:12px;
-            cursor:pointer;transition:all 0.2s ease;
-            font-family:var(--font-sans);"
-            onmouseover="this.style.background='rgba(155,85,245,0.12)';this.style.borderColor='rgba(155,85,245,0.5)'"
-            onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.borderColor='rgba(155,85,245,0.25)'">
-            <!-- Google G logo SVG -->
-            <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0;">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              <path fill="none" d="M0 0h48v48H0z"/>
-            </svg>
-            Continue with Google
-          </button>
+          <!-- Google button wrapper — styled to match app -->
+          <div style="display:flex;justify-content:center;width:100%;">
+            <div id="google-signin-btn"></div>
+          </div>
 
           <div class="auth-footer" style="margin-top:var(--space-5);">
-            Don't have an account?
-            <a href="/register.html">Create one</a>
+            Don't have an account? <a href="/register.html">Create one</a>
           </div>
         </div>
 
@@ -114,15 +85,13 @@
   <script>
     // ── Stars ──
     (function() {
-      const field = document.getElementById('star-field');
+      const f = document.getElementById('star-field');
       for (let i = 0; i < 150; i++) {
         const s = document.createElement('div');
         s.className = 'star';
         const sz = (Math.random()*2.5+0.5).toFixed(1);
-        const x = (Math.random()*100).toFixed(1);
-        const y = (Math.random()*100).toFixed(1);
-        s.style.cssText = `width:${sz}px;height:${sz}px;left:${x}%;top:${y}%;opacity:${(Math.random()*.6+.2).toFixed(2)};--dur:${(Math.random()*4+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s;`;
-        field.appendChild(s);
+        s.style.cssText = `width:${sz}px;height:${sz}px;left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*100).toFixed(1)}%;opacity:${(Math.random()*.6+.2).toFixed(2)};--dur:${(Math.random()*4+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s;`;
+        f.appendChild(s);
       }
     })();
 
@@ -134,65 +103,10 @@
       pg.classList.add('has-custom-bg');
     }
 
-    // ── Google Sign-In ──
-    const CLIENT_ID = window.APP_CONFIG?.GOOGLE_CLIENT_ID || '';
-
-    // Initialize Google Identity Services
-    function initGoogle() {
-      if (typeof google === 'undefined' || !google.accounts) return;
-      if (!CLIENT_ID) return;
-
-      google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleGoogleResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-        context: 'signin',
-      });
-    }
-
-    // Try to init immediately (script is sync loaded)
-    initGoogle();
-
-    // ── Google button click ──
-    document.getElementById('google-btn').addEventListener('click', function() {
-      if (typeof google === 'undefined' || !google.accounts) {
-        showMsg('Google is loading, please try again.', 'error');
-        return;
-      }
-      if (!CLIENT_ID) {
-        showMsg('Google Sign-In not configured.', 'error');
-        return;
-      }
-
-      // Re-initialize just in case
-      initGoogle();
-
-      // Show One Tap prompt
-      google.accounts.id.prompt(function(notification) {
-        if (notification.isNotDisplayed()) {
-          // One Tap blocked (e.g. user previously dismissed) — show popup instead
-          const params = new URLSearchParams({
-            client_id: CLIENT_ID,
-            redirect_uri: window.location.origin + '/login.html',
-            response_type: 'token id_token',
-            scope: 'openid email profile',
-            nonce: Math.random().toString(36).slice(2),
-            prompt: 'select_account',
-          });
-          window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
-        }
-      });
-    });
-
-    // ── Google callback (One Tap / GSI) ──
+    // ── Google callback ──
     window.handleGoogleResponse = async function(credentialResponse) {
       showMsg('Signing in with Google...', 'info');
-      const btn = document.getElementById('google-btn');
-      if (btn) btn.disabled = true;
-
       try {
-        // Dynamically import api to avoid module loading issues
         const { api } = await import('./js/api.js');
         const res = await api.googleLogin(credentialResponse.credential);
         api.setTokens(res.data.access_token, res.data.refresh_token);
@@ -200,18 +114,45 @@
         window.location.replace('/dashboard.html');
       } catch(e) {
         showMsg(e.message || 'Google sign-in failed. Try email/password.', 'error');
-        if (btn) btn.disabled = false;
       }
     };
 
-    // ── Handle redirect response (access_token in hash) ──
-    if (window.location.hash.includes('id_token=')) {
-      const hash = new URLSearchParams(window.location.hash.slice(1));
-      const idToken = hash.get('id_token');
-      if (idToken) {
-        window.handleGoogleResponse({ credential: idToken });
-        // Clean URL
-        history.replaceState({}, '', window.location.pathname);
+    // ── Init Google button ──
+    function initGoogleBtn() {
+      const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
+      if (!clientId || typeof google === 'undefined') return;
+
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+
+      // Render official Google button — most reliable cross-browser approach
+      google.accounts.id.renderButton(
+        document.getElementById('google-signin-btn'),
+        {
+          type: 'standard',
+          theme: 'filled_black',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: '360',
+        }
+      );
+    }
+
+    // Run after page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGoogleBtn);
+    } else {
+      // Script is sync — run directly, but wait for google to be ready
+      if (typeof google !== 'undefined') {
+        initGoogleBtn();
+      } else {
+        window.addEventListener('load', initGoogleBtn);
       }
     }
 
