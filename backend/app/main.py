@@ -95,3 +95,9 @@ async def not_found_handler(request: Request, exc):
 async def server_error_handler(request: Request, exc):
     logger.error(f"Internal server error: {exc}", exc_info=True)
     return JSONResponse(status_code=500, content={"success": False, "message": "Internal server error"})
+
+
+# Graceful shutdown
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Application shutting down gracefully")
