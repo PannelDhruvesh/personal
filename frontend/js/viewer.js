@@ -19,13 +19,19 @@ const dateEl  = document.getElementById('viewer-date');
 const favBtn  = document.getElementById('viewer-fav-btn');
 
 async function loadFile() {
-  // Try session cache first
+  // Try session cache first — skip API call if we have valid cached data
   const cached = sessionStorage.getItem('viewer_file');
   if (cached) {
-    file = JSON.parse(cached);
-    render();
+    try {
+      file = JSON.parse(cached);
+      if (file?.id === fileId) {
+        render();
+        return; // Cache hit — no API call needed
+      }
+    } catch (_) {}
   }
 
+  // Cache miss — fetch from API
   try {
     const res = await api.getFile(fileId);
     file = res.data;

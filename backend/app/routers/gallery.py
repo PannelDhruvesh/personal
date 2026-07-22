@@ -4,7 +4,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.models.file import File
-from app.services.storage import generate_signed_url
+from app.services.storage import generate_signed_url, generate_signed_urls_batch
 from app.utils.response import paginated_response
 from app.utils.validator import validate_search_query
 
@@ -28,8 +28,15 @@ def serialize_file(file, signed_url: str = None) -> dict:
     }
 
 
+def _serialize_batch(files) -> list:
+    """Serialize files with batch-generated signed URLs."""
+    paths = [f.storage_path for f in files if f.storage_path]
+    url_map = generate_signed_urls_batch(paths)
+    return [serialize_file(f, url_map.get(f.storage_path)) for f in files]
+
+
 @router.get("/")
-async def get_gallery(
+def get_gallery(
     page: int = Query(1, ge=1),
     limit: int = Query(30, ge=1, le=100),
     file_type: str = Query(None),
@@ -47,28 +54,22 @@ async def get_gallery(
         query = query.filter(File.file_type == file_type)
     if favorites_only:
         query = query.filter(File.is_favorite == True)
-    # Only filter by album_id if it's a valid non-null UUID string
     if album_id and album_id.lower() not in ("null", "undefined", "none", ""):
         import uuid as _uuid
         try:
             _uuid.UUID(album_id)
             query = query.filter(File.album_id == album_id)
         except ValueError:
-            pass  # invalid UUID — ignore filter
+            pass
 
     total = query.count()
     files = query.order_by(File.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
 
-    result = []
-    for f in files:
-        signed_url = generate_signed_url(f.storage_path)
-        result.append(serialize_file(f, signed_url))
-
-    return paginated_response(items=result, total=total, page=page, limit=limit)
+    return paginated_response(items=_serialize_batch(files), total=total, page=page, limit=limit)
 
 
 @router.get("/recent")
-async def get_recent(
+def get_recent(
     limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -78,16 +79,11 @@ async def get_recent(
         File.is_deleted == False
     ).order_by(File.created_at.desc()).limit(limit).all()
 
-    result = []
-    for f in files:
-        signed_url = generate_signed_url(f.storage_path)
-        result.append(serialize_file(f, signed_url))
-
-    return {"success": True, "data": result}
+    return {"success": True, "data": _serialize_batch(files)}
 
 
 @router.get("/search")
-async def search_files(
+def search_files(
     q: str = Query(..., min_length=1),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
@@ -100,20 +96,13 @@ async def search_files(
         File.is_deleted == False,
         File.original_filename.ilike(f"%{safe_query}%")
     )
-
     total = query.count()
     files = query.order_by(File.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
-
-    result = []
-    for f in files:
-        signed_url = generate_signed_url(f.storage_path)
-        result.append(serialize_file(f, signed_url))
-
-    return paginated_response(items=result, total=total, page=page, limit=limit)
+    return paginated_response(items=_serialize_batch(files), total=total, page=page, limit=limit)
 
 
 @router.get("/trash")
-async def get_trash(
+def get_trash(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -125,10 +114,4 @@ async def get_trash(
     )
     total = query.count()
     files = query.order_by(File.deleted_at.desc()).offset((page - 1) * limit).limit(limit).all()
-
-    result = []
-    for f in files:
-        signed_url = generate_signed_url(f.storage_path)
-        result.append(serialize_file(f, signed_url))
-
-    return paginated_response(items=result, total=total, page=page, limit=limit)
+    return paginated_response(items=_serialize_batch(files), total=total, page=page, limit=limit)

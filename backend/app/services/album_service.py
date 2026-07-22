@@ -25,6 +25,7 @@ def get_user_albums(
     user_id: uuid.UUID,
     include_hidden: bool = False,
     include_deleted: bool = False,
+    favorites_only: bool = False,
     skip: int = 0,
     limit: int = 50
 ) -> tuple[List[Album], int]:
@@ -34,6 +35,8 @@ def get_user_albums(
     )
     if not include_hidden:
         query = query.filter(Album.is_hidden == False)
+    if favorites_only:
+        query = query.filter(Album.is_favorite == True)
 
     total = query.count()
     albums = query.order_by(Album.is_favorite.desc(), Album.updated_at.desc()).offset(skip).limit(limit).all()

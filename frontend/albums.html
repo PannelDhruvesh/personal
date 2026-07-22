@@ -110,7 +110,12 @@
         if (currentTab === 'trash') {
           res = await api.getAlbumTrash({ page, limit:20 });
         } else {
-          res = await api.getAlbums({ page, limit:20, include_hidden: currentTab==='hidden' });
+          res = await api.getAlbums({
+            page,
+            limit: 20,
+            include_hidden: currentTab === 'hidden',
+            favorites_only: currentTab === 'favorites'
+          });
         }
         const albums = res.data;
         const pag = res.pagination;
@@ -123,9 +128,7 @@
           </div>`;
           return;
         }
-        let filtered = albums;
-        if (currentTab === 'favorites') filtered = albums.filter(a=>a.is_favorite);
-        filtered.forEach(a => grid.appendChild(albumCard(a)));
+        albums.forEach(a => grid.appendChild(albumCard(a)));
         hasMore = pag?.has_next||false;
         page++;
       } catch(_){ toast.error('Failed to load albums'); }

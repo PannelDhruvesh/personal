@@ -8,9 +8,9 @@ if (!requireAuth()) throw new Error('unauthenticated');
 async function init() {
   const user = getUser() || {};
   renderProfile(user);
-  const fresh = await loadProfile();
-  if (fresh) renderProfile(fresh);
-  loadStats();
+  // Parallel API calls — faster page load
+  const [fresh] = await Promise.allSettled([loadProfile(), loadStats()]);
+  if (fresh.status === 'fulfilled' && fresh.value) renderProfile(fresh.value);
 }
 
 async function loadProfile() {

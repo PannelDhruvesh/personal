@@ -148,47 +148,49 @@ uploadBtn?.addEventListener('click', startUpload);
 async function startUpload() {
   if (!selectedFiles.length) return;
   uploadBtn.disabled = true;
-  uploadBtn.textContent = '⏳ Uploading...';
+  uploadBtn.textContent = 'Uploading...';
 
-  let done = 0;
   const total = selectedFiles.length;
+  let done = 0;
 
-  for (let i = 0; i < total; i++) {
-    const file = selectedFiles[i];
+  // Upload in parallel with max 3 concurrent
+  const CONCURRENCY = 3;
+  const queue = [...selectedFiles.entries()];
+
+  async function uploadOne([i, file]) {
     const statusEl = document.getElementById(`status-${i}`);
     const progWrap = document.getElementById(`prog-wrap-${i}`);
     const progFill = document.getElementById(`prog-${i}`);
-
     if (progWrap) progWrap.style.display = 'block';
-    if (progFill) { progFill.style.width = '30%'; }
-
+    if (progFill) progFill.style.width = '20%';
     try {
       const formData = new FormData();
       formData.append('file', file);
       if (selectedAlbumId && selectedAlbumId !== 'null') formData.append('album_id', selectedAlbumId);
-
       await api.uploadFile(formData);
-
-      if (statusEl) statusEl.textContent = '✅';
+      if (statusEl) statusEl.textContent = '✓';
       if (progFill) progFill.style.width = '100%';
       done++;
-
-      if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
     } catch (err) {
-      if (statusEl) statusEl.textContent = '❌';
+      if (statusEl) statusEl.textContent = '✗';
       toast.error(`Failed: ${file.name}`);
     }
+    if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
   }
 
-  toast.success(`${done}/${total} files uploaded!`);
-  selectedFiles = [];
+  // Process in batches of CONCURRENCY
+  for (let i = 0; i < queue.length; i += CONCURRENCY) {
+    await Promise.allSettled(queue.slice(i, i + CONCURRENCY).map(uploadOne));
+  }
 
+  toast.success(`${done}/${total} uploaded!`);
+  selectedFiles = [];
   setTimeout(() => {
     renderPreviews();
     uploadBtn.disabled = false;
-    uploadBtn.textContent = '🚀 Upload';
+    uploadBtn.textContent = 'Upload';
     if (progressBar) progressBar.style.width = '0%';
-  }, 1500);
+  }, 1200);
 }
 
 loadAlbums();

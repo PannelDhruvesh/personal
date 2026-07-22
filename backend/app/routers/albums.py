@@ -29,10 +29,11 @@ def serialize_album(album) -> dict:
 
 
 @router.get("/")
-async def list_albums(
+def list_albums(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     include_hidden: bool = Query(False),
+    favorites_only: bool = Query(False),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -40,6 +41,7 @@ async def list_albums(
     albums, total = album_service.get_user_albums(
         db, current_user.id,
         include_hidden=include_hidden,
+        favorites_only=favorites_only,
         skip=skip,
         limit=limit
     )
@@ -50,7 +52,7 @@ async def list_albums(
 
 
 @router.post("/")
-async def create_album(
+def create_album(
     data: AlbumCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -60,7 +62,7 @@ async def create_album(
 
 
 @router.get("/trash")
-async def get_trash(
+def get_trash(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -81,7 +83,7 @@ async def get_trash(
 
 
 @router.get("/{album_id}")
-async def get_album(
+def get_album(
     album_id: uuid.UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -93,7 +95,7 @@ async def get_album(
 
 
 @router.patch("/{album_id}")
-async def update_album(
+def update_album(
     album_id: uuid.UUID,
     data: AlbumUpdate,
     db: Session = Depends(get_db),
@@ -108,7 +110,7 @@ async def update_album(
 
 
 @router.delete("/{album_id}")
-async def delete_album(
+def delete_album(
     album_id: uuid.UUID,
     permanent: bool = Query(False),
     db: Session = Depends(get_db),
@@ -127,7 +129,7 @@ async def delete_album(
 
 
 @router.post("/{album_id}/restore")
-async def restore_album(
+def restore_album(
     album_id: uuid.UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -141,7 +143,7 @@ async def restore_album(
 
 
 @router.post("/{album_id}/favorite")
-async def toggle_favorite(
+def toggle_favorite(
     album_id: uuid.UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

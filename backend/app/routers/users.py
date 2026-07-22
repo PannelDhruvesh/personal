@@ -16,7 +16,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get("/me")
-async def get_me(current_user: User = Depends(get_current_user)):
+def get_me(current_user: User = Depends(get_current_user)):
     # Generate signed URL for avatar if it's a storage path
     avatar_url = current_user.avatar_url
     if avatar_url and not avatar_url.startswith("http"):
@@ -39,7 +39,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 
 @router.patch("/me")
-async def update_profile(
+def update_profile(
     data: UpdateProfileRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -77,7 +77,7 @@ async def upload_avatar(
 
 
 @router.post("/me/change-password")
-async def change_password(
+def change_password(
     data: ChangePasswordRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -91,7 +91,7 @@ async def change_password(
 
 
 @router.get("/me/settings")
-async def get_settings(
+def get_settings(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -123,7 +123,7 @@ async def get_settings(
 
 
 @router.patch("/me/settings")
-async def update_settings(
+def update_settings(
     data: UpdateSettingsRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -148,7 +148,7 @@ async def update_settings(
 
 
 @router.delete("/me")
-async def delete_account(
+def delete_account(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

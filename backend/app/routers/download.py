@@ -14,7 +14,7 @@ router = APIRouter(prefix="/download", tags=["Download"])
 
 
 @router.get("/file/{file_id}")
-async def download_file(
+def download_file(
     file_id: uuid.UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -53,10 +53,13 @@ async def download_album_zip(
     if len(files) > 100:
         raise HTTPException(status_code=400, detail="Album too large to zip (max 100 files)")
 
+    # Fetch all file bytes concurrently
+    import asyncio
+    all_bytes = await asyncio.gather(*[get_file_bytes(f.storage_path) for f in files])
+
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        for file in files:
-            file_bytes = await get_file_bytes(file.storage_path)
+        for file, file_bytes in zip(files, all_bytes):
             if file_bytes:
                 zf.writestr(file.original_filename, file_bytes)
 

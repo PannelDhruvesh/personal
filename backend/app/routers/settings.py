@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from decimal import Decimal
+from sqlalchemy import func, case
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -11,57 +10,44 @@ from app.utils.response import success_response
 router = APIRouter(prefix="/settings", tags=["Settings"])
 
 
-def to_int(val) -> int:
-    """Convert Decimal/float/None to int safely."""
-    if val is None:
-        return 0
-    return int(val)
+def _fmt(size: int) -> str:
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} PB"
 
 
 @router.get("/storage-usage")
-async def get_storage_usage(
+def get_storage_usage(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    photo_stats = db.query(
-        func.count(File.id).label("count"),
-        func.coalesce(func.sum(File.file_size), 0).label("size")
+    # Single query using conditional aggregation — replaces 3 separate queries
+    row = db.query(
+        func.count(case((File.file_type == "photo", File.id), else_=None)).label("photo_count"),
+        func.coalesce(func.sum(case((File.file_type == "photo", File.file_size), else_=0)), 0).label("photo_size"),
+        func.count(case((File.file_type == "video", File.id), else_=None)).label("video_count"),
+        func.coalesce(func.sum(case((File.file_type == "video", File.file_size), else_=0)), 0).label("video_size"),
+        func.count(case((File.is_deleted == True, File.id), else_=None)).label("trash_count"),
+        func.coalesce(func.sum(case((File.is_deleted == True, File.file_size), else_=0)), 0).label("trash_size"),
     ).filter(
-        File.user_id == current_user.id,
-        File.file_type == "photo",
-        File.is_deleted == False
+        File.user_id == current_user.id
     ).first()
 
-    video_stats = db.query(
-        func.count(File.id).label("count"),
-        func.coalesce(func.sum(File.file_size), 0).label("size")
-    ).filter(
-        File.user_id == current_user.id,
-        File.file_type == "video",
-        File.is_deleted == False
-    ).first()
-
-    trash_stats = db.query(
-        func.count(File.id).label("count"),
-        func.coalesce(func.sum(File.file_size), 0).label("size")
-    ).filter(
-        File.user_id == current_user.id,
-        File.is_deleted == True
-    ).first()
-
-    used  = to_int(current_user.storage_used)
-    limit = to_int(current_user.storage_limit)
+    used = int(current_user.storage_used or 0)
+    limit = int(current_user.storage_limit or 0)
     percent = round((used / limit) * 100, 2) if limit else 0
 
     return success_response(data={
         "used_bytes":      used,
         "limit_bytes":     limit,
         "percent_used":    percent,
-        "used_formatted":  format_bytes(used),
-        "limit_formatted": format_bytes(limit),
-        "photos": {"count": to_int(photo_stats.count), "size": to_int(photo_stats.size)},
-        "videos": {"count": to_int(video_stats.count), "size": to_int(video_stats.size)},
-        "trash":  {"count": to_int(trash_stats.count), "size": to_int(trash_stats.size)},
+        "used_formatted":  _fmt(used),
+        "limit_formatted": _fmt(limit),
+        "photos": {"count": int(row.photo_count or 0), "size": int(row.photo_size or 0)},
+        "videos": {"count": int(row.video_count or 0), "size": int(row.video_size or 0)},
+        "trash":  {"count": int(row.trash_count or 0), "size": int(row.trash_size or 0)},
     })
 
 
@@ -70,26 +56,24 @@ async def empty_trash(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    from app.services.storage import delete_file_from_storage
+    from app.services.storage import delete_files_from_storage_batch
 
-    trash_files = db.query(File).filter(
+    trash_files = db.query(File.id, File.storage_path).filter(
         File.user_id == current_user.id,
         File.is_deleted == True
     ).all()
 
-    deleted_count = 0
-    for file in trash_files:
-        await delete_file_from_storage(file.storage_path)
-        db.delete(file)
-        deleted_count += 1
+    if not trash_files:
+        return success_response(message="Trash is already empty.")
 
+    paths = [f.storage_path for f in trash_files]
+    file_ids = [f.id for f in trash_files]
+
+    # Batch delete from storage
+    await delete_files_from_storage_batch(paths)
+
+    # Bulk DB delete
+    db.query(File).filter(File.id.in_(file_ids)).delete(synchronize_session=False)
     db.commit()
-    return success_response(message=f"Trash emptied. {deleted_count} files deleted permanently.")
 
-
-def format_bytes(size: int) -> str:
-    for unit in ["B", "KB", "MB", "GB", "TB"]:
-        if size < 1024:
-            return f"{size:.1f} {unit}"
-        size /= 1024
-    return f"{size:.1f} PB"
+    return success_response(message=f"Trash emptied. {len(file_ids)} files deleted permanently.")

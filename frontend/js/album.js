@@ -18,6 +18,24 @@ const grid = document.getElementById('album-grid');
 const albumName = document.getElementById('album-name');
 const albumCount = document.getElementById('album-count');
 
+// Shared observer for lazy-loading images and videos (1 instance for the whole grid)
+const albumObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      if (el.dataset.src) {
+        if (el.tagName === 'VIDEO') {
+          el.src = el.dataset.src;
+        } else {
+          el.src = el.dataset.src;
+        }
+        el.removeAttribute('data-src');
+        albumObserver.unobserve(el);
+      }
+    }
+  });
+}, { rootMargin: '200px' });
+
 async function loadAlbum() {
   try {
     const res = await api.getAlbum(albumId);
@@ -74,19 +92,16 @@ function createItem(file) {
     <div class="media-overlay"></div>
     ${file.file_type === 'photo'
       ? `<img data-src="${file.signed_url}" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${file.original_filename}"/>`
-      : `<video src="${file.signed_url}" muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
+      : `<video data-src="${file.signed_url}" muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
     }
     ${file.is_favorite ? '<span class="media-fav-icon">❤️</span>' : ''}
     ${file.file_type === 'video' ? '<span class="media-type-badge" style="position:absolute;bottom:5px;left:5px;">▶</span>' : ''}
   `;
 
-  const img = div.querySelector('img[data-src]');
-  if (img) {
-    new IntersectionObserver((entries, obs) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { img.src = img.dataset.src; img.removeAttribute('data-src'); obs.unobserve(img); }
-      });
-    }, { rootMargin: '150px' }).observe(img);
+  // Lazy-load both images and videos via shared observer
+  const lazyEl = div.querySelector('[data-src]');
+  if (lazyEl) {
+    albumObserver.observe(lazyEl);
   }
 
   div.addEventListener('click', () => {

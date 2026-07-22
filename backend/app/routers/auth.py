@@ -2,7 +2,7 @@ import random
 import string
 import logging
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from slowapi import Limiter
@@ -51,7 +51,7 @@ async def send_otp_email(email: str, otp: str, otp_type: str):
     html_body = f"""
     <html><body style="font-family:Arial,sans-serif;background:#fff0f5;padding:20px;">
     <div style="max-width:400px;margin:0 auto;background:#fff;border-radius:20px;padding:30px;text-align:center;">
-        <h2 style="color:#e91e8c;">Its Billi ❤️</h2>
+        <h2 style="color:#e91e8c;">Its Billi</h2>
         <p>Your verification code is:</p>
         <div style="font-size:36px;font-weight:bold;color:#e91e8c;letter-spacing:8px;margin:20px 0;">{otp}</div>
         <p style="color:#888;font-size:12px;">This code expires in 10 minutes. Do not share it with anyone.</p>
@@ -75,7 +75,7 @@ async def send_otp_email(email: str, otp: str, otp_type: str):
 
 
 @router.post("/register")
-async def register(data: RegisterRequest, db: Session = Depends(get_db)):
+async def register(data: RegisterRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     existing_email = db.query(User).filter(User.email == data.email).first()
     if existing_email:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -105,7 +105,8 @@ async def register(data: RegisterRequest, db: Session = Depends(get_db)):
     )
     db.commit()
 
-    await send_otp_email(data.email, otp, "register")
+    # Send email in background — response returns immediately
+    background_tasks.add_task(send_otp_email, data.email, otp, "register")
 
     return success_response(
         data={"user_id": str(user.id), "email": data.email},
@@ -117,7 +118,6 @@ async def register(data: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/verify-otp")
 @limiter.limit("10/minute")
 async def verify_otp(request: Request, data: VerifyOTPRequest, db: Session = Depends(get_db)):
-    # Check attempts — max 5 tries per OTP
     result = db.execute(
         text("""SELECT * FROM otp_verifications
            WHERE email = :email AND otp_type = :type
@@ -132,7 +132,6 @@ async def verify_otp(request: Request, data: VerifyOTPRequest, db: Session = Dep
     if result.attempts >= 5:
         raise HTTPException(status_code=429, detail="Too many attempts. Request a new code.")
 
-    # Increment attempts
     db.execute(
         text("UPDATE otp_verifications SET attempts = attempts + 1 WHERE id = :id"),
         {"id": result.id}
@@ -209,7 +208,7 @@ async def login(request: Request, data: LoginRequest, db: Session = Depends(get_
 
 
 @router.post("/refresh")
-async def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
+def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     result = db.execute(
         text("""SELECT rt.*, u.id as uid, u.email FROM refresh_tokens rt
            JOIN users u ON rt.user_id = u.id
@@ -230,7 +229,7 @@ async def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)
 
 
 @router.post("/logout")
-async def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
+def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     db.execute(
         text("UPDATE refresh_tokens SET is_revoked = TRUE WHERE token = :token"),
         {"token": data.refresh_token}
@@ -241,13 +240,12 @@ async def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
 
 @router.post("/resend-otp")
 @limiter.limit("3/minute")
-async def resend_otp(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+async def resend_otp(request: Request, data: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """Resend OTP for email verification during registration."""
     user = db.query(User).filter(User.email == data.email, User.is_verified == False).first()
     if user:
         otp = generate_otp()
         expires = datetime.now(timezone.utc) + timedelta(minutes=10)
-        # Invalidate previous unused OTPs
         db.execute(
             text("UPDATE otp_verifications SET is_used = TRUE WHERE email = :email AND otp_type = 'register' AND is_used = FALSE"),
             {"email": data.email}
@@ -257,13 +255,13 @@ async def resend_otp(request: Request, data: ForgotPasswordRequest, db: Session 
             {"uid": str(user.id), "email": data.email, "otp": otp, "exp": expires}
         )
         db.commit()
-        await send_otp_email(data.email, otp, "register")
+        background_tasks.add_task(send_otp_email, data.email, otp, "register")
     return success_response(message="If this account exists and is unverified, a new code has been sent.")
 
 
 @router.post("/forgot-password")
 @limiter.limit("5/minute")
-async def forgot_password(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+async def forgot_password(request: Request, data: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     if user:
         otp = generate_otp()
@@ -273,7 +271,7 @@ async def forgot_password(request: Request, data: ForgotPasswordRequest, db: Ses
             {"uid": str(user.id), "email": data.email, "otp": otp, "type": "reset_password", "exp": expires}
         )
         db.commit()
-        await send_otp_email(data.email, otp, "reset_password")
+        background_tasks.add_task(send_otp_email, data.email, otp, "reset_password")
 
     return success_response(message="If this email exists, a reset code has been sent.")
 

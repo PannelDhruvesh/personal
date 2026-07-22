@@ -10,11 +10,26 @@ let isLoading = false;
 let hasMore = true;
 let currentFilter = 'all';
 let currentView = 'medium';
+let currentAbort = null;
 const PAGE_SIZE = 30;
 
 const grid = document.getElementById('media-grid');
 const searchInput = document.getElementById('search-input');
 const filterChips = document.querySelectorAll('.chip[data-filter]');
+
+// ── Shared lazy-load observer (1 instance for all images) ──
+const imgObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        imgObserver.unobserve(img);
+      }
+    }
+  });
+}, { rootMargin: '300px' });
 
 async function loadFiles(reset = false) {
   if (isLoading || (!hasMore && !reset)) return;
@@ -23,16 +38,15 @@ async function loadFiles(reset = false) {
     currentPage = 1;
     hasMore = true;
     grid.innerHTML = renderSkeletons(12);
+    // Cancel any in-flight request
+    if (currentAbort) { currentAbort.abort(); }
   }
 
   isLoading = true;
   showLoadingSpinner(true);
 
   try {
-    const params = {
-      page: currentPage,
-      limit: PAGE_SIZE,
-    };
+    const params = { page: currentPage, limit: PAGE_SIZE };
     if (currentFilter === 'photos') params.file_type = 'photo';
     if (currentFilter === 'videos') params.file_type = 'video';
     if (currentFilter === 'favorites') params.favorites_only = true;
@@ -43,22 +57,23 @@ async function loadFiles(reset = false) {
     if (reset) grid.innerHTML = '';
 
     if (!files?.length && reset) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-state-icon">🖼️</div>
-          <p class="empty-state-title">No memories here</p>
-          <p class="empty-state-text">Upload your first photo or video</p>
-        </div>`;
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-icon" style="font-size:48px;opacity:0.4;">&#9651;</div>
+        <p class="empty-state-title">No memories here</p>
+        <p class="empty-state-text">Upload your first photo or video</p>
+      </div>`;
       return;
     }
 
-    files?.forEach(file => {
-      grid.appendChild(createMediaItem(file));
-    });
+    // Use DocumentFragment for efficient batch DOM insert
+    const frag = document.createDocumentFragment();
+    files?.forEach(file => frag.appendChild(createMediaItem(file)));
+    grid.appendChild(frag);
 
     hasMore = pagination?.has_next || false;
     currentPage++;
   } catch (err) {
+    if (err?.name === 'AbortError') return;
     if (reset) grid.innerHTML = '';
     toast.error('Failed to load media');
   } finally {
@@ -71,50 +86,56 @@ function createMediaItem(file) {
   const div = document.createElement('div');
   div.className = 'media-item';
   div.dataset.id = file.id;
-  div.dataset.type = file.file_type;
 
-  div.innerHTML = `
-    <div class="media-overlay"></div>
-    ${file.file_type === 'photo'
-      ? `<img data-src="${file.signed_url}" alt="${file.original_filename}" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />`
-      : `<video src="${file.signed_url}" muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
-    }
-    ${file.is_favorite ? '<span class="media-fav-icon">❤️</span>' : ''}
-    <div class="media-badges">
-      ${file.file_type === 'video'
-        ? `<span class="media-type-badge">▶ ${file.duration_seconds ? formatDuration(file.duration_seconds) : 'Video'}</span>`
-        : ''}
-    </div>
-  `;
+  const overlay = document.createElement('div');
+  overlay.className = 'media-overlay';
+  div.appendChild(overlay);
 
-  // Lazy load image
-  const img = div.querySelector('img[data-src]');
-  if (img) {
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          img.src = img.dataset.src;
-          img.removeAttribute('data-src');
-          obs.unobserve(img);
-        }
-      });
-    }, { rootMargin: '200px' });
-    observer.observe(img);
+  if (file.file_type === 'photo') {
+    const img = document.createElement('img');
+    img.dataset.src = file.signed_url || '';
+    img.alt = file.original_filename || '';
+    img.loading = 'lazy';
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    if (file.signed_url) imgObserver.observe(img);
+    div.appendChild(img);
+  } else {
+    // Videos: lazy-load src via observer
+    const vid = document.createElement('video');
+    vid.dataset.src = file.signed_url || '';
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.preload = 'none';
+    vid.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    div.appendChild(vid);
+    // Use same observer to set video src when near viewport
+    imgObserver.observe(vid);
   }
 
-  div.addEventListener('click', () => openViewer(file));
+  if (file.is_favorite) {
+    const fav = document.createElement('span');
+    fav.className = 'media-fav-icon';
+    fav.textContent = '♥';
+    div.appendChild(fav);
+  }
+
+  if (file.file_type === 'video') {
+    const badge = document.createElement('div');
+    badge.className = 'media-badges';
+    badge.innerHTML = `<span class="media-type-badge">&#9654; ${file.duration_seconds ? formatDuration(file.duration_seconds) : 'Video'}</span>`;
+    div.appendChild(badge);
+  }
+
+  div.addEventListener('click', () => {
+    sessionStorage.setItem('viewer_file', JSON.stringify(file));
+    window.location.href = `/viewer.html?id=${file.id}`;
+  });
   return div;
 }
 
-function openViewer(file) {
-  sessionStorage.setItem('viewer_file', JSON.stringify(file));
-  window.location.href = `/viewer.html?id=${file.id}`;
-}
-
 function renderSkeletons(count) {
-  return Array(count).fill(0).map(() =>
-    `<div class="skeleton" style="aspect-ratio:1;border-radius:4px;"></div>`
-  ).join('');
+  return Array(count).fill('<div class="skeleton" style="aspect-ratio:1;border-radius:4px;"></div>').join('');
 }
 
 function showLoadingSpinner(show) {
@@ -132,8 +153,10 @@ filterChips.forEach(chip => {
   });
 });
 
-// ── Search ──
+// ── Search with abort ──
+let searchAbort = null;
 const doSearch = debounce(async (q) => {
+  if (searchAbort) searchAbort.abort();
   if (!q.trim()) { loadFiles(true); return; }
   grid.innerHTML = renderSkeletons(6);
   try {
@@ -141,16 +164,22 @@ const doSearch = debounce(async (q) => {
     grid.innerHTML = '';
     const files = res.data;
     if (!files?.length) {
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><p class="empty-state-title">No results</p></div>`;
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-title">No results for "${q}"</div>
+      </div>`;
       return;
     }
-    files.forEach(f => grid.appendChild(createMediaItem(f)));
-  } catch (_) {}
-}, 400);
+    const frag = document.createDocumentFragment();
+    files.forEach(f => frag.appendChild(createMediaItem(f)));
+    grid.appendChild(frag);
+  } catch (e) {
+    if (e?.name !== 'AbortError') toast.error('Search failed');
+  }
+}, 350);
 
 searchInput?.addEventListener('input', (e) => doSearch(e.target.value));
 
-// ── Grid size toggle ──
+// ── Grid size ──
 document.querySelectorAll('[data-grid]').forEach(btn => {
   btn.addEventListener('click', () => {
     currentView = btn.dataset.grid;
@@ -161,7 +190,6 @@ document.querySelectorAll('[data-grid]').forEach(btn => {
   });
 });
 
-// Load saved grid size
 const savedGrid = localStorage.getItem('grid_size') || 'medium';
 currentView = savedGrid;
 grid.className = `media-grid grid-${savedGrid}`;
@@ -170,10 +198,9 @@ document.querySelector(`[data-grid="${savedGrid}"]`)?.classList.add('active');
 // ── Infinite scroll ──
 const sentinel = document.getElementById('scroll-sentinel');
 if (sentinel) {
-  const observer = new IntersectionObserver((entries) => {
+  new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) loadFiles();
-  }, { rootMargin: '200px' });
-  observer.observe(sentinel);
+  }, { rootMargin: '300px' }).observe(sentinel);
 }
 
 loadFiles(true);

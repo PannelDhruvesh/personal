@@ -63,47 +63,52 @@ def _serialize_activity(row) -> dict:
 # ── Overview stats ────────────────────────────────────────────────────────────
 
 @router.get("/stats")
-async def get_stats(
+def get_stats(
     db: Session = Depends(get_db),
     _: User = Depends(get_admin_user)
 ):
-    total_users = db.query(func.count(User.id)).scalar()
-    active_users = db.query(func.count(User.id)).filter(User.is_active == True).scalar()
-    verified_users = db.query(func.count(User.id)).filter(User.is_verified == True).scalar()
-    total_files = db.query(func.count(File.id)).filter(File.is_deleted == False).scalar()
-    total_photos = db.query(func.count(File.id)).filter(File.file_type == "photo", File.is_deleted == False).scalar()
-    total_videos = db.query(func.count(File.id)).filter(File.file_type == "video", File.is_deleted == False).scalar()
-    total_albums = db.query(func.count(Album.id)).filter(Album.is_deleted == False).scalar()
-    total_storage = int(db.query(func.coalesce(func.sum(File.file_size), 0)).filter(File.is_deleted == False).scalar() or 0)
-    trash_files = db.query(func.count(File.id)).filter(File.is_deleted == True).scalar()
+    from sqlalchemy import case as sa_case
 
-    # New users in last 7 days
+    # Users stats — 2 queries instead of 4
+    user_row = db.query(
+        func.count(User.id).label("total"),
+        func.count(sa_case((User.is_active == True, User.id), else_=None)).label("active"),
+        func.count(sa_case((User.is_verified == True, User.id), else_=None)).label("verified"),
+    ).first()
+
     week_ago = datetime.now(timezone.utc) - timedelta(days=7)
     new_users_week = db.query(func.count(User.id)).filter(User.created_at >= week_ago).scalar()
 
-    # Uploads in last 7 days
-    uploads_week = db.query(func.count(File.id)).filter(File.created_at >= week_ago).scalar()
+    # Files stats — 1 combined query instead of 5
+    file_row = db.query(
+        func.count(File.id).label("total"),
+        func.count(sa_case((File.file_type == "photo", File.id), else_=None)).label("photos"),
+        func.count(sa_case((File.file_type == "video", File.id), else_=None)).label("videos"),
+        func.count(sa_case((File.is_deleted == True, File.id), else_=None)).label("trash"),
+        func.coalesce(func.sum(sa_case((File.is_deleted == False, File.file_size), else_=0)), 0).label("total_size"),
+        func.count(sa_case(((File.is_deleted == False) & (File.created_at >= week_ago), File.id), else_=None)).label("uploads_week"),
+    ).first()
+
+    total_albums = db.query(func.count(Album.id)).filter(Album.is_deleted == False).scalar()
 
     return success_response(data={
         "users": {
-            "total": total_users,
-            "active": active_users,
-            "verified": verified_users,
-            "new_this_week": new_users_week,
+            "total": int(user_row.total),
+            "active": int(user_row.active),
+            "verified": int(user_row.verified),
+            "new_this_week": int(new_users_week),
         },
         "files": {
-            "total": total_files,
-            "photos": total_photos,
-            "videos": total_videos,
-            "in_trash": trash_files,
-            "uploads_this_week": uploads_week,
+            "total": int(file_row.total - file_row.trash),
+            "photos": int(file_row.photos),
+            "videos": int(file_row.videos),
+            "in_trash": int(file_row.trash),
+            "uploads_this_week": int(file_row.uploads_week),
         },
-        "albums": {
-            "total": total_albums,
-        },
+        "albums": {"total": int(total_albums)},
         "storage": {
-            "total_bytes": total_storage,
-            "total_fmt": _fmt_bytes(total_storage),
+            "total_bytes": int(file_row.total_size),
+            "total_fmt": _fmt_bytes(int(file_row.total_size)),
         }
     })
 
@@ -111,7 +116,7 @@ async def get_stats(
 # ── Users list ────────────────────────────────────────────────────────────────
 
 @router.get("/users")
-async def list_users(
+def list_users(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     search: Optional[str] = Query(None),
@@ -146,7 +151,7 @@ async def list_users(
 # ── Single user detail ────────────────────────────────────────────────────────
 
 @router.get("/users/{user_id}")
-async def get_user_detail(
+def get_user_detail(
     user_id: uuid.UUID,
     db: Session = Depends(get_db),
     _: User = Depends(get_admin_user)
@@ -189,7 +194,7 @@ async def get_user_detail(
 # ── Suspend / activate user ───────────────────────────────────────────────────
 
 @router.patch("/users/{user_id}/status")
-async def update_user_status(
+def update_user_status(
     user_id: uuid.UUID,
     is_active: bool,
     db: Session = Depends(get_db),
@@ -216,7 +221,7 @@ async def update_user_status(
 # ── Toggle admin role ─────────────────────────────────────────────────────────
 
 @router.patch("/users/{user_id}/admin")
-async def toggle_admin_role(
+def toggle_admin_role(
     user_id: uuid.UUID,
     is_admin: bool,
     db: Session = Depends(get_db),
@@ -241,7 +246,7 @@ async def toggle_admin_role(
 # ── Force delete user ─────────────────────────────────────────────────────────
 
 @router.delete("/users/{user_id}")
-async def delete_user(
+def delete_user(
     user_id: uuid.UUID,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user)
@@ -262,7 +267,7 @@ async def delete_user(
 # ── Update storage limit for a user ──────────────────────────────────────────
 
 @router.patch("/users/{user_id}/storage-limit")
-async def update_storage_limit(
+def update_storage_limit(
     user_id: uuid.UUID,
     limit_gb: float = Query(..., gt=0, le=1000),
     db: Session = Depends(get_db),
@@ -286,7 +291,7 @@ async def update_storage_limit(
 # ── Activity log (all users) ──────────────────────────────────────────────────
 
 @router.get("/activity")
-async def get_activity_logs(
+def get_activity_logs(
     page: int = Query(1, ge=1),
     limit: int = Query(30, ge=1, le=100),
     user_id: Optional[str] = Query(None),
@@ -328,7 +333,7 @@ async def get_activity_logs(
 # ── Files overview (all users) ────────────────────────────────────────────────
 
 @router.get("/files")
-async def list_all_files(
+def list_all_files(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     user_id: Optional[str] = Query(None),

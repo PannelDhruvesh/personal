@@ -60,9 +60,16 @@ async def google_login(data: GoogleTokenRequest, db: Session = Depends(get_db)):
 
     if not user:
         base_username = re.sub(r'[^a-z0-9_]', '_', email.split("@")[0].lower())[:30]
+        # Fetch all existing usernames matching the base in one query
+        existing_usernames = {
+            row[0] for row in db.execute(
+                text("SELECT username FROM users WHERE username LIKE :pattern"),
+                {"pattern": f"{base_username}%"}
+            ).fetchall()
+        }
         username = base_username
         counter = 1
-        while db.query(User).filter(User.username == username).first():
+        while username in existing_usernames:
             username = f"{base_username}{counter}"
             counter += 1
 
