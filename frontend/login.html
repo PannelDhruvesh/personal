@@ -26,7 +26,35 @@
       <div class="auth-inner">
 
         <div class="auth-logo">
-          <div class="auth-logo-icon">IB</div>
+          <!--
+            ══════════════════════════════════════════
+            LOGO IMAGE — Apni photo/logo yahan lagao
+            ══════════════════════════════════════════
+            Option 1: Frontend folder mein image rakho
+              → frontend/images/logo.png  (ya .jpg/.webp)
+              → src ko "/images/logo.png" karo
+
+            Option 2: Koi bhi online image URL use karo
+              → src ko direct URL dedo
+
+            Option 3: Default "IB" text dikhta rahe
+              → Bas ye <img> tag comment mein hi rehne do
+
+            ABHI: /images/logo.png use ho raha hai
+            Agar image nahi milti toh "IB" fallback dikhega
+            ══════════════════════════════════════════
+          -->
+          <div class="auth-logo-icon" id="logo-icon">
+            <!-- Apni image yahan -->
+            <img
+              src="/images/logo.png"
+              alt="Its Billi Logo"
+              style="width:100%;height:100%;object-fit:cover;border-radius:20px;"
+              onerror="this.style.display='none';document.getElementById('logo-text').style.display='block';"
+            />
+            <!-- Fallback text agar image nahi mili -->
+            <span id="logo-text" style="display:none;font-size:18px;font-weight:900;color:white;">IB</span>
+          </div>
           <h1 class="auth-logo-title">Its Billi</h1>
           <p class="auth-logo-sub">Your private memory space</p>
         </div>
