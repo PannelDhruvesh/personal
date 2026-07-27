@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#04020f" />
   <title>Home — Its Billi</title>
+  <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://personal-awj6.onrender.com" />
   <link rel="preconnect" href="https://eeenctmnaegspaldzkhb.supabase.co" />
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/nav.css" />
   <link rel="stylesheet" href="css/dashboard.css" />
 </head>
 <body>
@@ -22,7 +24,7 @@
         <p class="greeting-text">Hello</p>
         <p class="greeting-name" id="greeting-name">Loading...</p>
       </div>
-      <a href="/profile.html">
+      <a href="/profile.html" aria-label="Profile">
         <div class="avatar avatar-md" id="user-avatar" style="background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;"></div>
       </a>
     </header>
@@ -33,7 +35,7 @@
       <!-- Storage Widget -->
       <div class="storage-widget animate-fadeInUp" style="margin-bottom:20px;">
         <div class="storage-header">
-          <span class="storage-title">💾 Storage Used</span>
+          <span class="storage-title">Storage Used</span>
           <span class="storage-value">
             <span id="storage-used-text">—</span> / <span id="storage-limit-text">—</span>
           </span>
@@ -47,18 +49,24 @@
       <!-- Quick stats -->
       <div class="stats-row animate-fadeInUp delay-100">
         <div class="stat-card">
-          <div class="stat-icon">📸</div>
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--purple-400)"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2z"/></svg>
+          </div>
           <div class="stat-value" id="stat-photos">—</div>
           <div class="stat-label">Photos</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🎬</div>
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--purple-400)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          </div>
           <div class="stat-value" id="stat-videos">—</div>
           <div class="stat-label">Videos</div>
         </div>
-        <div class="stat-card" onclick="location.href='/gallery.html?filter=favorites'">
-          <div class="stat-icon">❤️</div>
-          <div class="stat-value">♾</div>
+        <div class="stat-card" onclick="location.href='/gallery.html?filter=favorites'" style="cursor:pointer;">
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#f87171"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+          <div class="stat-value">All</div>
           <div class="stat-label">Favorites</div>
         </div>
       </div>
@@ -66,22 +74,30 @@
       <!-- Quick actions -->
       <div class="quick-actions animate-fadeInUp delay-200">
         <div class="quick-action-btn" onclick="location.href='/upload.html'">
-          <div class="quick-action-icon">📤</div>
+          <div class="quick-action-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </div>
           <div class="quick-action-label">Upload</div>
-          <div class="quick-action-sub">Photos & videos</div>
+          <div class="quick-action-sub">Photos &amp; videos</div>
         </div>
-        <div class="quick-action-btn" onclick="location.href='/album.html'">
-          <div class="quick-action-icon">📁</div>
+        <div class="quick-action-btn" onclick="location.href='/albums.html'">
+          <div class="quick-action-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg>
+          </div>
           <div class="quick-action-label">Albums</div>
           <div class="quick-action-sub">Organize memories</div>
         </div>
         <div class="quick-action-btn" onclick="location.href='/gallery.html'">
-          <div class="quick-action-icon">🖼️</div>
+          <div class="quick-action-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2zM5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+          </div>
           <div class="quick-action-label">Gallery</div>
           <div class="quick-action-sub">All memories</div>
         </div>
         <div class="quick-action-btn" onclick="location.href='/gallery.html?filter=favorites'">
-          <div class="quick-action-icon">❤️</div>
+          <div class="quick-action-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
           <div class="quick-action-label">Favorites</div>
           <div class="quick-action-sub">Your best ones</div>
         </div>
@@ -106,7 +122,7 @@
       <div class="dash-section animate-fadeInUp delay-400">
         <div class="section-header">
           <span class="section-title">Albums</span>
-          <a href="/album.html" class="section-action">See all →</a>
+          <a href="/albums.html" class="section-action">See all →</a>
         </div>
         <div class="albums-grid-mini" id="albums-mini-grid">
           <div class="skeleton" style="height:140px;border-radius:14px;"></div>
@@ -120,86 +136,42 @@
 
     <!-- Bottom navbar -->
     <nav class="bottom-nav">
-      <a href="/dashboard.html" class="nav-item active">
-        <span class="nav-icon">🏠</span>
+      <a href="/dashboard.html" class="nav-item active" aria-label="Home">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
         <span class="nav-label">Home</span>
       </a>
-      <a href="/albums.html" class="nav-item">
-        <span class="nav-icon">📁</span>
+      <a href="/albums.html" class="nav-item" aria-label="Albums">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></span>
         <span class="nav-label">Albums</span>
       </a>
-      <a href="/upload.html" class="nav-item nav-fab">
-        <span class="nav-fab-icon">+</span>
+      <a href="/upload.html" class="nav-item nav-fab" aria-label="Upload">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
       </a>
-      <a href="/gallery.html" class="nav-item">
-        <span class="nav-icon">🖼️</span>
+      <a href="/gallery.html" class="nav-item" aria-label="Gallery">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2z"/></svg></span>
         <span class="nav-label">Gallery</span>
       </a>
-      <a href="/profile.html" class="nav-item">
-        <span class="nav-icon">👤</span>
+      <a href="/profile.html" class="nav-item" aria-label="Profile">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
         <span class="nav-label">Profile</span>
       </a>
     </nav>
 
   </div>
 
+  <!-- Server wake indicator -->
+  <div id="server-wake-toast" style="display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(124,45,232,0.92);color:white;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:9999;backdrop-filter:blur(10px);gap:8px;align-items:center;white-space:nowrap;">
+    <span style="width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;display:inline-block;animation:spin 0.8s linear infinite;flex-shrink:0;"></span>
+    Waking up server...
+  </div>
   <style>
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: var(--app-max-width);
-      height: calc(var(--navbar-height) + var(--safe-bottom));
-      padding-bottom: var(--safe-bottom);
-      background: rgba(13,13,13,0.92);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-top: 1px solid var(--dark-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      z-index: var(--z-navbar);
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      flex: 1;
-      padding: 8px 0;
-      text-decoration: none;
-      color: var(--dark-muted);
-      transition: var(--transition-base);
-      position: relative;
-    }
-    .nav-item.active { color: var(--pink-500); }
-    .nav-item.active .nav-icon { transform: scale(1.15); }
-    .nav-icon { font-size: 22px; transition: transform 0.2s var(--ease-spring); }
-    .nav-label { font-size: 10px; font-weight: 600; }
-    .nav-fab {
-      width: 56px; height: 56px;
-      background: var(--gradient-primary);
-      border-radius: 18px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px rgba(233,30,140,0.5);
-      margin-top: -16px;
-      flex: 0 0 56px;
-    }
-    .nav-fab-icon { font-size: 28px; color: white; font-weight: 300; line-height: 1; }
-    .nav-item:active { transform: scale(0.92); }
-    .nav-fab:active { transform: scale(0.92) translateY(0) !important; }
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    .nav-icon svg { width:22px; height:22px; fill:currentColor; }
+    .quick-action-icon { width:44px; height:44px; border-radius:var(--radius-md); background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(124,45,232,0.35); }
+    .stat-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; margin-bottom:var(--space-2); }
   </style>
 
   <script src="config.js"></script>
   <script type="module" src="js/dashboard.js"></script>
-
-  <!-- Server wake-up indicator (Render free tier cold start) -->
-  <div id="server-wake-toast" style="display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(124,45,232,0.92);color:white;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:9999;backdrop-filter:blur(10px);gap:8px;align-items:center;white-space:nowrap;">
-    <span style="width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;display:inline-block;animation:spin 0.8s linear infinite;"></span>
-    Waking up server...
-  </div>
-  <style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
 </body>
 </html>
