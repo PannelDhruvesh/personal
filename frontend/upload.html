@@ -26,7 +26,7 @@
       <div style="width:44px;"></div>
     </header>
 
-    <main class="page-content" style="padding-top:76px;">
+    <main class="page-content" style="padding-top:76px;padding-bottom:calc(140px + var(--safe-bottom));">
 
       <!-- Upload zone -->
       <div class="upload-zone" id="upload-zone">
@@ -54,14 +54,14 @@
         <div id="preview-list"></div>
       </div>
 
-      <!-- Upload button -->
-      <div style="margin-top:24px;" id="upload-btn-section">
-        <button class="btn btn-primary btn-full" id="upload-btn" disabled>
-          🚀 Upload
-        </button>
-      </div>
-
     </main>
+
+    <!-- Upload button — fixed above bottom nav, always visible -->
+    <div style="position:fixed;bottom:calc(var(--navbar-height) + var(--safe-bottom) + 12px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:calc(var(--app-max-width) - 32px);z-index:var(--z-sticky);">
+      <button class="btn btn-primary btn-full" id="upload-btn" disabled style="box-shadow:0 4px 24px rgba(124,45,232,0.45);">
+        Upload
+      </button>
+    </div>
 
     <!-- Album picker bottom sheet -->
     <div id="album-sheet-backdrop"

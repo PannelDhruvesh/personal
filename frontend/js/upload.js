@@ -118,7 +118,7 @@ function renderPreviews() {
           <div class="upload-item-progress-fill" id="prog-${i}" style="width:0%"></div>
         </div>
       </div>
-      <span class="file-preview-status" id="status-${i}">⏳</span>
+      <span class="file-preview-status" id="status-${i}" style="font-size:14px;color:var(--dark-muted);">—</span>
       <button onclick="removeFile(${i})" style="color:var(--dark-muted);font-size:18px;padding:4px 8px;background:none;border:none;cursor:pointer;">✕</button>
     </div>
   `).join('');
@@ -169,8 +169,7 @@ async function startUpload() {
       if (selectedAlbumId && selectedAlbumId !== 'null') formData.append('album_id', selectedAlbumId);
       await api.uploadFile(formData);
       if (statusEl) statusEl.textContent = '✓';
-      if (progFill) progFill.style.width = '100%';
-      done++;
+      if (progFill) progFill.style.width = '100%';      done++;
     } catch (err) {
       if (statusEl) statusEl.textContent = '✗';
       toast.error(`Failed: ${file.name}`);
