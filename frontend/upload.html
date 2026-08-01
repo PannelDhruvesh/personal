@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/upload.css" />
-</head>
-<body>
+</head><body>
   <div id="app" class="app-container">
 
     <!-- Global progress bar -->
@@ -79,11 +78,25 @@
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-      <a href="/dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="/album.html"     class="nav-item"><span class="nav-icon">📁</span><span class="nav-label">Albums</span></a>
-      <a href="/upload.html"    class="nav-item nav-fab active-fab"><span class="nav-fab-icon">+</span></a>
-      <a href="/gallery.html"   class="nav-item"><span class="nav-icon">🖼️</span><span class="nav-label">Gallery</span></a>
-      <a href="/profile.html"   class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></a>
+      <a href="/dashboard.html" class="nav-item" aria-label="Home">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="/albums.html" class="nav-item" aria-label="Albums">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></span>
+        <span class="nav-label">Albums</span>
+      </a>
+      <a href="/upload.html" class="nav-item nav-fab" aria-label="Upload">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
+      </a>
+      <a href="/gallery.html" class="nav-item" aria-label="Gallery">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2z"/></svg></span>
+        <span class="nav-label">Gallery</span>
+      </a>
+      <a href="/profile.html" class="nav-item" aria-label="Profile">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="nav-label">Profile</span>
+      </a>
     </nav>
 
   </div>

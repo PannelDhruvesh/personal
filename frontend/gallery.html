@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#04020f" />
   <title>Gallery — Its Billi</title>
   <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://personal-awj6.onrender.com" />
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/global.css" />
@@ -21,14 +22,14 @@
       <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:10px;">
         <span class="topbar-title">Gallery</span>
         <div style="display:flex;gap:8px;">
-          <button data-grid="small"  class="btn btn-icon" title="Small grid">⊞</button>
-          <button data-grid="medium" class="btn btn-icon active" title="Medium grid">⊟</button>
-          <button data-grid="large"  class="btn btn-icon" title="Large grid">▣</button>
+          <button data-grid="small"  class="btn btn-icon" title="Small grid" style="font-size:16px;">&#8862;</button>
+          <button data-grid="medium" class="btn btn-icon active" title="Medium grid" style="font-size:16px;">&#8863;</button>
+          <button data-grid="large"  class="btn btn-icon" title="Large grid" style="font-size:16px;">&#9635;</button>
         </div>
       </div>
       <!-- Search -->
       <div class="input-wrapper" style="width:100%;">
-        <span class="input-icon">🔍</span>
+        <span class="input-icon" style="font-size:14px;">&#9906;</span>
         <input type="search" id="search-input" class="input-field"
           placeholder="Search memories..." style="padding-left:44px;" />
       </div>
@@ -53,32 +54,39 @@
 
       <!-- Loading spinner -->
       <div id="load-spinner" style="display:none;justify-content:center;padding:32px;">
-        <div style="width:32px;height:32px;border:3px solid rgba(233,30,140,0.3);border-top-color:var(--pink-500);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <div style="width:32px;height:32px;border:3px solid rgba(155,85,245,0.3);border-top-color:var(--purple-400);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
       </div>
     </main>
 
-    <!-- Bottom Nav -->
+    <!-- Bottom Nav (SVG icons) -->
     <nav class="bottom-nav">
-      <a href="/dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="/album.html"     class="nav-item"><span class="nav-icon">📁</span><span class="nav-label">Albums</span></a>
-      <a href="/upload.html"    class="nav-item nav-fab"><span class="nav-fab-icon">+</span></a>
-      <a href="/gallery.html"   class="nav-item active"><span class="nav-icon">🖼️</span><span class="nav-label">Gallery</span></a>
-      <a href="/profile.html"   class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></a>
+      <a href="/dashboard.html" class="nav-item" aria-label="Home">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="/albums.html" class="nav-item" aria-label="Albums">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></span>
+        <span class="nav-label">Albums</span>
+      </a>
+      <a href="/upload.html" class="nav-item nav-fab" aria-label="Upload">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
+      </a>
+      <a href="/gallery.html" class="nav-item active" aria-label="Gallery">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2z"/></svg></span>
+        <span class="nav-label">Gallery</span>
+      </a>
+      <a href="/profile.html" class="nav-item" aria-label="Profile">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="nav-label">Profile</span>
+      </a>
     </nav>
 
   </div>
 
   <style>
-    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--app-max-width);height:calc(var(--navbar-height) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:rgba(13,13,13,0.92);backdrop-filter:blur(24px);border-top:1px solid var(--dark-border);display:flex;align-items:center;justify-content:space-around;z-index:var(--z-navbar);}
-    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;padding:8px 0;text-decoration:none;color:var(--dark-muted);transition:var(--transition-base);}
-    .nav-item.active{color:var(--pink-500);}
-    .nav-icon{font-size:22px;}
-    .nav-label{font-size:10px;font-weight:600;}
-    .nav-fab{width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(233,30,140,0.5);margin-top:-16px;flex:0 0 56px;}
-    .nav-fab-icon{font-size:28px;color:white;font-weight:300;line-height:1;}
-    .nav-item:active{transform:scale(0.92);}
-    [data-grid].active{background:var(--gradient-primary);color:white;border-color:transparent;}
     @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    [data-grid].active{background:var(--gradient-primary);color:white;border-color:transparent;}
+    .nav-icon svg{width:22px;height:22px;fill:currentColor;}
   </style>
 
   <script src="config.js"></script>
