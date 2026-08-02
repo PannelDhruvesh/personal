@@ -27,7 +27,7 @@
       </div>
     </header>
 
-    <main style="padding-top:72px;padding-bottom:calc(72px + var(--safe-bottom));">
+    <main style="padding-top:calc(var(--topbar-height) + 8px);padding-bottom:calc(var(--navbar-height) + var(--safe-bottom) + 16px);">
       <div id="album-grid" class="media-grid grid-medium" style="padding:3px;"></div>
       <div id="scroll-sentinel" style="height:1px;"></div>
       <div id="load-spinner" style="display:none;justify-content:center;padding:32px;">
@@ -36,8 +36,8 @@
     </main>
 
     <!-- FAB: upload to this album -->
-    <a href="#" id="fab-upload" style="position:fixed;bottom:calc(80px + var(--safe-bottom));right:20px;width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 20px rgba(233,30,140,0.5);z-index:150;text-decoration:none;color:white;">
-      📤
+    <a href="#" id="fab-upload" style="position:fixed;bottom:calc(var(--navbar-height) + var(--safe-bottom) + 12px);right:20px;width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 20px rgba(124,45,232,0.5);z-index:150;text-decoration:none;color:white;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
     </a>
 
     <!-- Bottom Nav -->

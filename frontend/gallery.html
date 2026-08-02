@@ -18,8 +18,8 @@
   <div id="app" class="app-container">
 
     <!-- Top bar -->
-    <header class="topbar" style="flex-direction:column;height:auto;padding:12px 16px 8px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:10px;">
+    <header class="topbar" style="flex-direction:column;height:auto;min-height:var(--topbar-height);padding:8px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:8px;">
         <span class="topbar-title">Gallery</span>
         <div style="display:flex;gap:8px;">
           <button data-grid="small"  class="btn btn-icon" title="Small grid" style="font-size:16px;">&#8862;</button>
@@ -41,7 +41,7 @@
       Waking up server...
     </div>
 
-    <main style="padding-top:114px;padding-bottom:calc(72px + var(--safe-bottom));">
+    <main style="padding-top:120px;padding-bottom:calc(var(--navbar-height) + var(--safe-bottom) + 16px);">
       <!-- Filter chips -->
       <div class="gallery-toolbar" style="border-bottom:none;padding:10px 16px 6px;">
         <div class="filter-chips">

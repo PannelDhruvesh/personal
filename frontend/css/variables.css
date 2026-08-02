@@ -105,7 +105,7 @@
   /* ── Layout ── */
   --app-max-width: 430px;
   --navbar-height: 72px;
-  --topbar-height: 60px;
+  --topbar-height: 72px;
   --safe-bottom:   env(safe-area-inset-bottom, 16px);
 
   /* ── Custom Background ── */

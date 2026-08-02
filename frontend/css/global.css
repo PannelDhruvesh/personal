@@ -61,7 +61,8 @@ body.has-bg .app-container::before {
   flex: 1;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding: var(--topbar-height) var(--space-4) var(--space-4);
+  /* top clears the fixed topbar, sides = 16px, bottom clears fixed nav + safe area */
+  padding: calc(var(--topbar-height) + 8px) var(--space-4) calc(var(--navbar-height) + var(--safe-bottom) + 16px);
 }
 
 /* ── Safe bottom helper ── */
@@ -209,6 +210,7 @@ body.has-bg .app-container::before {
   width: 100%;
   max-width: var(--app-max-width);
   height: var(--topbar-height);
+  min-height: var(--topbar-height);
   background: rgba(4, 2, 15, 0.80);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -218,6 +220,7 @@ body.has-bg .app-container::before {
   justify-content: space-between;
   padding: 0 var(--space-5);
   z-index: var(--z-sticky);
+  box-sizing: border-box;
 }
 
 .topbar-title {

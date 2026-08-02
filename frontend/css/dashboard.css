@@ -72,6 +72,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-3);
   margin-bottom: var(--space-5);
+  /* relies on page-content padding for horizontal spacing */
 }
 
 .stat-card {
@@ -107,7 +108,7 @@
 
 /* ── Section ── */
 .dash-section {
-  padding: 0 var(--space-5);
+  /* No extra horizontal padding — relies on page-content sides padding */
   margin-bottom: var(--space-6);
 }
 
@@ -163,7 +164,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
-  padding: 0 var(--space-5);
+  /* No horizontal padding — inherits from page-content padding */
   margin-bottom: var(--space-5);
 }
 
