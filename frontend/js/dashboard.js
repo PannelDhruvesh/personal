@@ -3,7 +3,7 @@ import { requireAuth, getUser, refreshUserProfile } from './auth.js';
 import { toast } from './toast.js';
 import { formatBytes, timeAgo, getInitials } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+await requireAuth();
 
 const user = getUser();
 
@@ -73,15 +73,49 @@ async function loadRecentFiles() {
       return;
     }
 
-    container.innerHTML = files.map(f => `
-      <div class="recent-thumb" onclick="openViewer('${esc(f.id)}', '${esc(f.file_type)}', '${esc(f.signed_url)}')">
-        ${f.file_type === 'photo'
-          ? `<img src="${esc(f.signed_url)}" alt="${esc(f.original_filename)}" loading="lazy" />`
-          : `<video src="${esc(f.signed_url)}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
-             <span class="recent-video-badge">&#9654;</span>`
-        }
-      </div>
-    `).join('');
+    // Clear container and build safely with DOM methods
+    container.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    
+    files.forEach(f => {
+      const thumb = document.createElement('div');
+      thumb.className = 'recent-thumb';
+      thumb.style.cursor = 'pointer';
+      
+      if (f.file_type === 'photo') {
+        const img = document.createElement('img');
+        img.setAttribute('src', String(f.signed_url || ''));
+        img.setAttribute('alt', String(f.original_filename || ''));
+        img.setAttribute('loading', 'lazy');
+        thumb.appendChild(img);
+      } else {
+        const video = document.createElement('video');
+        video.setAttribute('src', String(f.signed_url || ''));
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        thumb.appendChild(video);
+        
+        const badge = document.createElement('span');
+        badge.className = 'recent-video-badge';
+        badge.textContent = '▶';
+        thumb.appendChild(badge);
+      }
+      
+      // Use proper event listener instead of onclick attribute
+      thumb.addEventListener('click', () => {
+        sessionStorage.setItem('viewer_file', JSON.stringify({
+          id: f.id,
+          file_type: f.file_type,
+          signed_url: f.signed_url
+        }));
+        window.location.href = `/viewer.html?id=${encodeURIComponent(f.id)}`;
+      });
+      
+      fragment.appendChild(thumb);
+    });
+    
+    container.appendChild(fragment);
   } catch (_) {
     container.innerHTML = '';
   }
@@ -130,10 +164,6 @@ function safeSet(id, value) {
   if (el) el.textContent = value;
 }
 
-// Expose for inline onclick
-window.openViewer = function (id, type, url) {
-  sessionStorage.setItem('viewer_file', JSON.stringify({ id, file_type: type, signed_url: url }));
-  window.location.href = `/viewer.html?id=${id}`;
-};
+// No longer needed - using event listeners instead of inline onclick
 
 init();

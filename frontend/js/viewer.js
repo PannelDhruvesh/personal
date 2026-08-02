@@ -3,7 +3,7 @@ import { requireAuth } from './auth.js';
 import { toast } from './toast.js';
 import { formatBytes, timeAgo } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+await requireAuth();
 
 const params = new URLSearchParams(location.search);
 const fileId = params.get('id');
@@ -44,23 +44,41 @@ async function loadFile() {
 function render() {
   if (!file) return;
 
-  if (titleEl) titleEl.textContent = file.original_filename;
+  // Sanitize and safely set text content
+  if (titleEl) titleEl.textContent = file.original_filename || 'Untitled';
   if (sizeEl)  sizeEl.textContent  = formatBytes(file.file_size);
   if (dateEl)  dateEl.textContent  = timeAgo(file.created_at);
   if (favBtn)  favBtn.textContent  = file.is_favorite ? '❤️' : '🤍';
 
   if (mediaContainer) {
+    // Clear previous content
+    mediaContainer.innerHTML = '';
+    
     if (file.file_type === 'photo') {
-      mediaContainer.innerHTML = `
-        <img id="viewer-img" src="${file.signed_url}" alt="${file.original_filename}"
-          style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;user-select:none;"
-          draggable="false" />`;
+      const img = document.createElement('img');
+      img.id = 'viewer-img';
+      // Sanitize URL - only use if it's a valid URL
+      const safeUrl = String(file.signed_url || '').trim();
+      if (safeUrl) {
+        img.setAttribute('src', safeUrl);
+      }
+      img.setAttribute('alt', '');
+      img.setAttribute('draggable', 'false');
+      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;user-select:none;';
+      mediaContainer.appendChild(img);
       initPinchZoom();
     } else {
-      mediaContainer.innerHTML = `
-        <video id="viewer-video" src="${file.signed_url}" controls playsinline
-          style="max-width:100%;max-height:100%;border-radius:8px;"
-          autoplay></video>`;
+      const video = document.createElement('video');
+      video.id = 'viewer-video';
+      const safeUrl = String(file.signed_url || '').trim();
+      if (safeUrl) {
+        video.setAttribute('src', safeUrl);
+      }
+      video.setAttribute('controls', '');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('autoplay', '');
+      video.style.cssText = 'max-width:100%;max-height:100%;border-radius:8px;';
+      mediaContainer.appendChild(video);
     }
   }
 }

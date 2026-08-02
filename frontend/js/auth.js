@@ -19,13 +19,24 @@ export function isLoggedIn() {
 /**
  * Redirect to login if not authenticated.
  * Call at top of every protected page.
+ * Validates token by attempting to fetch user profile.
  */
-export function requireAuth() {
+export async function requireAuth() {
   if (!isLoggedIn()) {
     window.location.replace('/login.html');
     return false;
   }
-  return true;
+  
+  // Validate token by attempting to fetch user profile
+  try {
+    await api.getMe();
+    return true;
+  } catch (err) {
+    // Token is invalid/expired - clear and redirect
+    api.clearTokens();
+    window.location.replace('/login.html');
+    return false;
+  }
 }
 
 /**

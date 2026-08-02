@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/upload.css" />
+  <link rel="stylesheet" href="css/nav.css" />
 </head><body>
   <div id="app" class="app-container">
 
@@ -100,21 +101,6 @@
     </nav>
 
   </div>
-
-  <style>
-    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--app-max-width);height:calc(var(--navbar-height) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:rgba(13,13,13,0.92);backdrop-filter:blur(24px);border-top:1px solid var(--dark-border);display:flex;align-items:center;justify-content:space-around;z-index:var(--z-navbar);}
-    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;padding:8px 0;text-decoration:none;color:var(--dark-muted);transition:var(--transition-base);}
-    .nav-item.active{color:var(--pink-500);}
-    .nav-icon{font-size:22px;}
-    .nav-label{font-size:10px;font-weight:600;}
-    .nav-fab{width:56px;height:56px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(233,30,140,0.5);margin-top:-16px;flex:0 0 56px;}
-    .nav-fab-icon{font-size:28px;color:white;font-weight:300;line-height:1;}
-    .nav-item:active{transform:scale(0.92);}
-    .album-sheet.open{transform:translateX(-50%) translateY(0)!important;}
-    #album-sheet.open + div, #album-sheet-backdrop{display:block!important;}
-    .album-sheet-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;cursor:pointer;color:var(--dark-text);font-size:15px;font-weight:500;transition:background 0.15s;}
-    .album-sheet-item:active{background:rgba(255,255,255,0.05);}
-  </style>
 
   <script>
     function openSheet() {

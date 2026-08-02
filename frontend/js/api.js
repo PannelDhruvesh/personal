@@ -25,6 +25,9 @@ class ApiClient {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('viewer_file');
+    // Clear all sessionStorage to prevent data leaks
+    sessionStorage.clear();
   }
 
   async refreshAccessToken() {
@@ -65,6 +68,8 @@ class ApiClient {
     try {
       response = await fetch(url, { ...options, headers });
     } catch (networkErr) {
+      // Skip retry for intentional aborts
+      if (networkErr.name === 'AbortError') throw networkErr;
       // Likely Render cold start — retry once after delay
       if (wakeEl) { wakeEl.style.display = 'flex'; }
       await new Promise(r => setTimeout(r, 3000));
@@ -90,6 +95,24 @@ class ApiClient {
       } finally {
         this._refreshing = false;
       }
+    }
+
+    // Rate limited → surface a clear error
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After');
+      const msg = retryAfter
+        ? `Too many requests. Please wait ${retryAfter}s before retrying.`
+        : 'Too many requests. Please slow down.';
+      const error = new ApiError(msg, 429, {});
+      error.retryAfter = retryAfter;
+      throw error;
+    }
+
+    // Forbidden → clear session and redirect to login
+    if (response.status === 403) {
+      this.clearTokens();
+      window.location.href = '/login.html';
+      throw new ApiError('Access denied', 403, {});
     }
 
     const data = await response.json().catch(() => ({}));

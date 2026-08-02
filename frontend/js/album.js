@@ -3,7 +3,7 @@ import { requireAuth } from './auth.js';
 import { toast } from './toast.js';
 import { formatDuration } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+await requireAuth();
 
 const params = new URLSearchParams(location.search);
 const albumId = params.get('id');
@@ -88,25 +88,55 @@ function createItem(file) {
   const div = document.createElement('div');
   div.className = 'media-item';
   div.dataset.id = file.id;
-  div.innerHTML = `
-    <div class="media-overlay"></div>
-    ${file.file_type === 'photo'
-      ? `<img data-src="${file.signed_url}" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${file.original_filename}"/>`
-      : `<video data-src="${file.signed_url}" muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
-    }
-    ${file.is_favorite ? '<span class="media-fav-icon">❤️</span>' : ''}
-    ${file.file_type === 'video' ? '<span class="media-type-badge" style="position:absolute;bottom:5px;left:5px;">▶</span>' : ''}
-  `;
-
-  // Lazy-load both images and videos via shared observer
-  const lazyEl = div.querySelector('[data-src]');
-  if (lazyEl) {
-    albumObserver.observe(lazyEl);
+  
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'media-overlay';
+  div.appendChild(overlay);
+  
+  // Safely create media element
+  const safeUrl = String(file.signed_url || '').trim();
+  const safeName = String(file.original_filename || '').trim();
+  
+  if (file.file_type === 'photo') {
+    const img = document.createElement('img');
+    img.setAttribute('data-src', safeUrl);
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+    img.setAttribute('alt', safeName);
+    div.appendChild(img);
+    if (safeUrl) albumObserver.observe(img);
+  } else {
+    const video = document.createElement('video');
+    video.setAttribute('data-src', safeUrl);
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('preload', 'none');
+    video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    div.appendChild(video);
+    if (safeUrl) albumObserver.observe(video);
+  }
+  
+  // Add favorite icon
+  if (file.is_favorite) {
+    const fav = document.createElement('span');
+    fav.className = 'media-fav-icon';
+    fav.textContent = '❤️';
+    div.appendChild(fav);
+  }
+  
+  // Add video badge
+  if (file.file_type === 'video') {
+    const badge = document.createElement('span');
+    badge.className = 'media-type-badge';
+    badge.style.cssText = 'position:absolute;bottom:5px;left:5px;';
+    badge.textContent = '▶';
+    div.appendChild(badge);
   }
 
   div.addEventListener('click', () => {
     sessionStorage.setItem('viewer_file', JSON.stringify(file));
-    location.href = `/viewer.html?id=${file.id}`;
+    location.href = `/viewer.html?id=${encodeURIComponent(file.id)}`;
   });
   return div;
 }

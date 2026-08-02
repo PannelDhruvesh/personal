@@ -3,7 +3,7 @@ import { requireAuth } from './auth.js';
 import { toast } from './toast.js';
 import { formatDuration, debounce } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+await requireAuth();
 
 let currentPage = 1;
 let isLoading = false;
@@ -40,6 +40,7 @@ async function loadFiles(reset = false) {
     grid.innerHTML = renderSkeletons(12);
     // Cancel any in-flight request
     if (currentAbort) { currentAbort.abort(); }
+    currentAbort = new AbortController();
   }
 
   isLoading = true;
@@ -156,9 +157,21 @@ filterChips.forEach(chip => {
 // ── Search with abort ──
 let searchAbort = null;
 const doSearch = debounce(async (q) => {
-  if (searchAbort) searchAbort.abort();
-  if (!q.trim()) { loadFiles(true); return; }
+  // Cancel previous search request
+  if (searchAbort) {
+    searchAbort.abort();
+  }
+  
+  if (!q.trim()) { 
+    searchAbort = null;
+    loadFiles(true); 
+    return; 
+  }
+  
+  // Create new abort controller for this search
+  searchAbort = new AbortController();
   grid.innerHTML = renderSkeletons(6);
+  
   try {
     const res = await api.searchFiles(q.trim());
     grid.innerHTML = '';
@@ -174,6 +187,8 @@ const doSearch = debounce(async (q) => {
     grid.appendChild(frag);
   } catch (e) {
     if (e?.name !== 'AbortError') toast.error('Search failed');
+  } finally {
+    searchAbort = null;
   }
 }, 350);
 
