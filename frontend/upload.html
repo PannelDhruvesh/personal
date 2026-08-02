@@ -87,7 +87,7 @@
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></span>
         <span class="nav-label">Albums</span>
       </a>
-      <a href="/upload.html" class="nav-item nav-fab" aria-label="Upload">
+      <a href="/upload.html" class="nav-item nav-fab active" aria-label="Upload">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
       </a>
       <a href="/gallery.html" class="nav-item" aria-label="Gallery">
@@ -117,6 +117,23 @@
     }
     window.closeAlbumSheet = closeSheet;
   </script>
+
+  <style>
+    /* Album sheet list item */
+    .album-sheet-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--dark-text);
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .album-sheet-item:active { background: rgba(255,255,255,0.05); }
+  </style>
 
   <script src="config.js"></script>
   <script type="module" src="js/upload.js"></script>

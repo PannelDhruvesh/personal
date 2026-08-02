@@ -30,7 +30,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  background: rgba(233,30,140,0.12);
+  background: rgba(155, 85, 245, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,9 +113,9 @@
 }
 
 .radio-option.selected {
-  border-color: var(--pink-500);
-  background: rgba(233,30,140,0.12);
-  color: var(--pink-400);
+  border-color: var(--purple-400);
+  background: rgba(155, 85, 245, 0.12);
+  color: var(--purple-300);
 }
 
 /* ── Storage bar ── */

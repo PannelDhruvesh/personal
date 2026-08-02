@@ -37,7 +37,7 @@
   background: var(--gradient-primary);
   border-color: transparent;
   color: var(--white);
-  box-shadow: 0 2px 12px rgba(233,30,140,0.35);
+  box-shadow: 0 2px 12px rgba(124, 45, 232, 0.4);
 }
 
 /* ── Grid sizes ── */
@@ -124,7 +124,7 @@
 }
 
 .media-item.selected .media-select-ring {
-  border-color: var(--pink-500);
+  border-color: var(--purple-400);
 }
 
 .media-item.selected .media-check {
