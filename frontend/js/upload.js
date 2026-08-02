@@ -204,6 +204,15 @@ async function startUpload() {
   }
 
   toast.success(`${done}/${total} uploaded!`);
+
+  // Signal dashboard to reload fresh data on next visit
+  if (done > 0) {
+    sessionStorage.setItem('dashboard_needs_refresh', '1');
+    // Also clear the locally cached user so dashboard re-fetches fresh profile
+    // (avatar_url, storage_used etc. may have changed)
+    localStorage.removeItem('user');
+  }
+
   selectedFiles = [];
   setTimeout(() => {
     renderPreviews();

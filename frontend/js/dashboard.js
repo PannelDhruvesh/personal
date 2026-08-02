@@ -5,10 +5,28 @@ import { formatBytes, timeAgo, getInitials } from './utils.js';
 
 await requireAuth();
 
-const user = getUser();
+let user = getUser();
 
 async function init() {
   renderUserInfo(user);
+
+  // If we just came back from an upload, re-fetch fresh user profile
+  // (storage_used, photo count etc. changed server-side)
+  const needsRefresh = sessionStorage.getItem('dashboard_needs_refresh');
+  if (needsRefresh) {
+    sessionStorage.removeItem('dashboard_needs_refresh');
+    try {
+      const res = await api.getMe();
+      if (res?.data) {
+        user = res.data;
+        // Update localStorage cache with fresh data
+        const { setUser } = await import('./auth.js');
+        setUser(user);
+        renderUserInfo(user);
+      }
+    } catch (_) {}
+  }
+
   await Promise.all([loadStorageStats(), loadRecentFiles(), loadAlbums()]);
 }
 
