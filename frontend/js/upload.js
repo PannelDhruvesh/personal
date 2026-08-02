@@ -3,7 +3,9 @@ import { requireAuth } from './auth.js';
 import { toast } from './toast.js';
 import { formatBytes } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+// Auth guard — must await since requireAuth is async
+const __authOk = await requireAuth();
+if (!__authOk) throw new Error('unauthenticated');
 
 const ALLOWED_TYPES = ['image/jpeg','image/png','image/gif','image/webp','image/heic','video/mp4','video/quicktime','video/webm','video/x-msvideo'];
 const MAX_SIZE = 100 * 1024 * 1024;
@@ -32,23 +34,42 @@ async function loadAlbums() {
 }
 
 function renderAlbumSheet() {
-  albumSheetList.innerHTML = `
-    <div class="album-sheet-item" data-id="" onclick="selectAlbum('', 'No Album')">
-      <span>📁</span><span>No Album (Uncategorized)</span>
-    </div>
-  ` + albums.map(a => `
-    <div class="album-sheet-item" data-id="${a.id}" onclick="selectAlbum('${a.id}', '${a.name}')">
-      <span>📂</span><span>${a.name} (${a.file_count})</span>
-    </div>
-  `).join('');
+  albumSheetList.innerHTML = '';
+
+  const noAlbum = document.createElement('div');
+  noAlbum.className = 'album-sheet-item';
+  noAlbum.dataset.id = '';
+  noAlbum.dataset.name = 'No Album';
+  noAlbum.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.5;flex-shrink:0"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span>No Album (Uncategorized)</span>';
+  albumSheetList.appendChild(noAlbum);
+
+  albums.forEach(a => {
+    const item = document.createElement('div');
+    item.className = 'album-sheet-item';
+    item.dataset.id = a.id;
+    item.dataset.name = a.name;
+    const svg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;opacity:0.7"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>';
+    const span = document.createElement('span');
+    span.textContent = `${a.name} (${a.file_count})`;
+    item.innerHTML = svg;
+    item.appendChild(span);
+    albumSheetList.appendChild(item);
+  });
+
+  // Event delegation — single listener for all items
+  albumSheetList.onclick = (e) => {
+    const item = e.target.closest('.album-sheet-item');
+    if (!item) return;
+    selectAlbum(item.dataset.id, item.dataset.name);
+  };
 }
 
-window.selectAlbum = function(id, name) {
+function selectAlbum(id, name) {
   selectedAlbumId = id || null;
-  albumValue.textContent = name;
+  albumValue.textContent = name || 'No Album';
   albumSelect.classList.toggle('selected', !!id);
   closeAlbumSheet();
-};
+}
 
 albumSelect?.addEventListener('click', () => {
   if (typeof openSheet === 'function') openSheet();
@@ -109,7 +130,7 @@ function renderPreviews() {
   previewList.innerHTML = selectedFiles.map((f, i) => `
     <div class="file-preview-item" id="preview-${i}">
       <div class="file-preview-thumb" id="thumb-${i}">
-        ${f.type.startsWith('image/') ? '' : '🎬'}
+        ${f.type.startsWith('image/') ? '' : '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.5;"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>'}
       </div>
       <div class="file-preview-info">
         <div class="file-preview-name">${f.name}</div>

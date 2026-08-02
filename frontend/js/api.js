@@ -108,11 +108,19 @@ class ApiClient {
       throw error;
     }
 
-    // Forbidden → clear session and redirect to login
+    // Forbidden
     if (response.status === 403) {
-      this.clearTokens();
-      window.location.href = '/login.html';
-      throw new ApiError('Access denied', 403, {});
+      const data403 = await response.json().catch(() => ({}));
+      const msg403 = data403.detail || data403.message || 'Access denied';
+      // Only clear session if it's an auth/account-level 403, not a resource-level one
+      const isAuthForbidden = endpoint.includes('/auth/') ||
+        msg403.toLowerCase().includes('suspended') ||
+        msg403.toLowerCase().includes('account');
+      if (isAuthForbidden) {
+        this.clearTokens();
+        window.location.href = '/login.html';
+      }
+      throw new ApiError(msg403, 403, data403);
     }
 
     const data = await response.json().catch(() => ({}));

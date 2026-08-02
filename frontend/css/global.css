@@ -20,7 +20,7 @@ body {
   margin: 0 auto;
   position: relative;
   background: transparent;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* When custom bg is active — make cards glass */
@@ -62,6 +62,11 @@ body.has-bg .app-container::before {
   overflow-y: auto;
   overscroll-behavior-y: contain;
   padding: var(--topbar-height) var(--space-4) var(--space-4);
+}
+
+/* ── Safe bottom helper ── */
+.safe-bottom-padding {
+  padding-bottom: calc(var(--navbar-height) + var(--safe-bottom) + 16px);
 }
 
 /* ── Glass Card ── */

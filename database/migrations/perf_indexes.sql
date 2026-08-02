@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_files_trash
     ON files (user_id, is_deleted, deleted_at DESC);
 
 -- Trigram search on filename (ILIKE '%...%')
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;  
 CREATE INDEX IF NOT EXISTS idx_files_filename_trgm
     ON files USING gin (original_filename gin_trgm_ops);
 

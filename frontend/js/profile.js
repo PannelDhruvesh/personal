@@ -3,7 +3,9 @@ import { requireAuth, getUser, setUser, logout } from './auth.js';
 import { toast } from './toast.js';
 import { getInitials, formatBytes } from './utils.js';
 
-if (!requireAuth()) throw new Error('unauthenticated');
+// Auth guard — must await since requireAuth is async
+const __authOk = await requireAuth();
+if (!__authOk) throw new Error('unauthenticated');
 
 async function init() {
   const user = getUser() || {};

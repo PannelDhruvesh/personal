@@ -33,6 +33,8 @@
   border-radius: var(--radius-xl);
   padding: var(--space-4) var(--space-5);
   margin-bottom: var(--space-3);
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .storage-header {
@@ -202,16 +204,16 @@
   font-weight: 700;
   color: var(--dark-text);
   line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .quick-action-sub {
   font-size: var(--text-xs);
   color: var(--dark-subtext);
   display: none;
-}
-.quick-action-sub {
-  font-size: var(--text-xs);
-  color: var(--dark-subtext);
 }
 
 /* ── Album grid on dashboard ── */

@@ -17,22 +17,42 @@ export function isLoggedIn() {
 }
 
 /**
+ * Check if a JWT token is expired (or within 60s of expiry).
+ * Returns true if expired/invalid, false if still valid.
+ */
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // Consider expired if within 60 seconds of expiry
+    return payload.exp * 1000 < Date.now() + 60000;
+  } catch {
+    return true;
+  }
+}
+
+/**
  * Redirect to login if not authenticated.
  * Call at top of every protected page.
- * Validates token by attempting to fetch user profile.
+ * Skips API round-trip if token is still valid (performance optimization).
  */
 export async function requireAuth() {
-  if (!isLoggedIn()) {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
     window.location.replace('/login.html');
     return false;
   }
-  
-  // Validate token by attempting to fetch user profile
+
+  // If token is still valid, skip API call
+  if (!isTokenExpired(token)) {
+    return true;
+  }
+
+  // Token expired or about to expire — try to refresh/validate
   try {
     await api.getMe();
     return true;
   } catch (err) {
-    // Token is invalid/expired - clear and redirect
     api.clearTokens();
     window.location.replace('/login.html');
     return false;

@@ -10,6 +10,7 @@ from app.models.user import User
 from app.auth.jwt_handler import create_access_token, create_refresh_token
 from app.utils.response import success_response
 from app.config import settings
+from app.services.storage import generate_signed_url
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -135,7 +136,7 @@ async def google_login(data: GoogleTokenRequest, db: Session = Depends(get_db)):
             "email": user.email,
             "username": user.username,
             "display_name": user.display_name,
-            "avatar_url": user.avatar_url,
+            "avatar_url": generate_signed_url(user.avatar_url) if user.avatar_url and not user.avatar_url.startswith("http") else user.avatar_url,
             "is_admin": bool(user.is_admin)
         }
     })
