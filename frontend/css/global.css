@@ -5,7 +5,9 @@ body {
   color: var(--dark-text);
   font-size: var(--text-base);
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow: hidden;          /* body itself never scrolls — #app handles it */
+  height: 100vh;
+  height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-size: cover;
@@ -15,12 +17,14 @@ body {
 
 #app, .app-container {
   max-width: var(--app-max-width);
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   margin: 0 auto;
   position: relative;
   background: transparent;
-  overflow-x: hidden;
+  overflow: hidden;          /* clips children; .page-content scrolls internally */
+  display: flex;
+  flex-direction: column;
 }
 
 /* When custom bg is active — make cards glass */
@@ -60,9 +64,11 @@ body.has-bg .app-container::before {
 .page-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;  /* smooth momentum scroll on iOS */
   overscroll-behavior-y: contain;
   /* top clears the fixed topbar, sides = 16px, bottom clears fixed nav + safe area */
   padding: calc(var(--topbar-height) + 8px) var(--space-4) calc(var(--navbar-height) + var(--safe-bottom) + 16px);
+  min-height: 0;             /* required for flex child to shrink and scroll */
 }
 
 /* ── Safe bottom helper ── */
