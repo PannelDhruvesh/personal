@@ -9,12 +9,13 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Allow body to scroll on mobile — do NOT set overflow:hidden here */
 }
 
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  overscroll-behavior: none;
+  /* overscroll-behavior: none removed — it suppresses touch scroll on Android Chrome */
 }
 
 img, video {
