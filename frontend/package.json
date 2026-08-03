@@ -1,0 +1,14 @@
+{
+  "name": "its-billi-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Its Billi photo gallery",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "lint": "echo 'No linter configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.12"
+  }
+}
