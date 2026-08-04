@@ -164,15 +164,20 @@ window.removeFile = function(idx) {
 };
 
 // ── Upload ──
+let _uploading = false; // guard against duplicate submissions
 uploadBtn?.addEventListener('click', startUpload);
 
 async function startUpload() {
-  if (!selectedFiles.length) return;
+  if (!selectedFiles.length || _uploading) return;
+  _uploading = true;
   uploadBtn.disabled = true;
   uploadBtn.textContent = 'Uploading...';
 
   const total = selectedFiles.length;
-  let done = 0;
+  // Track processing (all files attempted) vs successful
+  let completedCount = 0;  // files that finished processing (success OR fail)
+  let successfulCount = 0; // files successfully uploaded
+  let failedCount = 0;     // files that failed
 
   // Upload in parallel with max 3 concurrent
   const CONCURRENCY = 3;
@@ -190,12 +195,17 @@ async function startUpload() {
       if (selectedAlbumId && selectedAlbumId !== 'null') formData.append('album_id', selectedAlbumId);
       await api.uploadFile(formData);
       if (statusEl) statusEl.textContent = '✓';
-      if (progFill) progFill.style.width = '100%';      done++;
+      if (progFill) progFill.style.width = '100%';
+      successfulCount++;
     } catch (err) {
       if (statusEl) statusEl.textContent = '✗';
+      if (progFill) progFill.style.width = '0%';
+      failedCount++;
       toast.error(`Failed: ${file.name}`);
     }
-    if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
+    // Progress = processed files / total — counts both success and failure
+    completedCount++;
+    if (progressBar) progressBar.style.width = `${(completedCount / total) * 100}%`;
   }
 
   // Process in batches of CONCURRENCY
@@ -203,17 +213,23 @@ async function startUpload() {
     await Promise.allSettled(queue.slice(i, i + CONCURRENCY).map(uploadOne));
   }
 
-  toast.success(`${done}/${total} uploaded!`);
+  // Final summary — only shows 100% when ALL files have been processed
+  if (failedCount > 0) {
+    toast.warning(`${successfulCount} uploaded, ${failedCount} failed`);
+  } else {
+    toast.success(`${successfulCount}/${total} uploaded!`);
+  }
 
   // Signal dashboard to reload fresh data on next visit
-  if (done > 0) {
+  if (successfulCount > 0) {
     sessionStorage.setItem('dashboard_needs_refresh', '1');
-    // Also clear the locally cached user so dashboard re-fetches fresh profile
+    // Clear cached user so dashboard re-fetches fresh profile
     // (avatar_url, storage_used etc. may have changed)
     localStorage.removeItem('user');
   }
 
   selectedFiles = [];
+  _uploading = false;
   setTimeout(() => {
     renderPreviews();
     uploadBtn.disabled = false;

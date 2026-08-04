@@ -101,7 +101,14 @@ async def google_login(data: GoogleTokenRequest, db: Session = Depends(get_db)):
     else:
         if not user.is_active:
             raise HTTPException(status_code=403, detail="Account is suspended")
-        if picture and user.avatar_url != picture:
+        # IMPORTANT: Only set Google picture as avatar if the user has NO custom avatar.
+        # A custom avatar is stored as a relative storage path (not starting with "http").
+        # Never overwrite a manually uploaded avatar with the Google profile picture.
+        has_custom_avatar = (
+            user.avatar_url is not None
+            and not user.avatar_url.startswith("http")
+        )
+        if picture and not has_custom_avatar and user.avatar_url != picture:
             user.avatar_url = picture
         user.is_verified = True
         db.commit()

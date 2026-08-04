@@ -79,10 +79,10 @@ async def process_and_upload_file(
     db.commit()
     db.refresh(db_file)
 
-    # Update user storage usage
-    if user:
-        user.storage_used = (user.storage_used or 0) + file_size
-        db.commit()
+    # NOTE: Do NOT manually update storage_used here.
+    # The database trigger on_file_storage_change (INSERT on files)
+    # already increments users.storage_used atomically.
+    # Updating here as well would double-count every upload.
 
     return db_file
 

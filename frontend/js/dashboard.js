@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { requireAuth, getUser, refreshUserProfile } from './auth.js';
+import { requireAuth, getUser, setUser, refreshUserProfile } from './auth.js';
 import { toast } from './toast.js';
 import { formatBytes, timeAgo, getInitials } from './utils.js';
 
@@ -19,8 +19,7 @@ async function init() {
       const res = await api.getMe();
       if (res?.data) {
         user = res.data;
-        // Update localStorage cache with fresh data
-        const { setUser } = await import('./auth.js');
+        // Update localStorage cache with fresh data (setUser is already imported above)
         setUser(user);
         renderUserInfo(user);
       }

@@ -18,8 +18,8 @@ let registeredEmail = '';
 function setLoading(loading, btn = submitBtn, text = 'Create Account') {
   btn.disabled = loading;
   btn.innerHTML = loading
-    ? '<span class="animate-spin" style="display:inline-block">⏳</span> Creating...'
-    : `✨ ${text}`;
+    ? '<span class="animate-spin" style="display:inline-block">&#8987;</span> Creating...'
+    : text;
 }
 
 function showMessage(msg, type = 'error') {
@@ -127,7 +127,7 @@ document.getElementById('verify-btn')?.addEventListener('click', async () => {
 
   const btn = document.getElementById('verify-btn');
   btn.disabled = true;
-  btn.textContent = '⏳ Verifying...';
+  btn.textContent = 'Verifying...';
 
   try {
     await api.verifyOtp({ email: registeredEmail, otp_code: code, otp_type: 'register' });
@@ -138,7 +138,7 @@ document.getElementById('verify-btn')?.addEventListener('click', async () => {
     verifyMsg.className = 'form-message error';
     verifyMsg.style.display = 'block';
     btn.disabled = false;
-    btn.textContent = '✅ Verify';
+    btn.textContent = 'Verify';
     document.querySelectorAll('.otp-input').forEach(i => {
       i.classList.add('animate-shake');
       i.addEventListener('animationend', () => i.classList.remove('animate-shake'), { once: true });

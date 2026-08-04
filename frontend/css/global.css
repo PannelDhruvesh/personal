@@ -1,12 +1,23 @@
 /* ── App Shell ── */
+html {
+  min-height: 100%;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--dark-bg);
   color: var(--dark-text);
   font-size: var(--text-base);
   line-height: 1.5;
-  /* overflow-x:hidden removed from body — combined with #app overflow-x:hidden
-     it kills touch scroll on Android Chrome. Width is controlled by max-width. */
+  min-height: 100%;
+  min-height: 100dvh;
+  /* overflow-x:hidden must NOT be combined with any overflow on #app —
+     doing so creates a new scroll container that kills vertical touch scrolling
+     on Android Chrome. Horizontal clipping handled by max-width. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Allow native vertical pan gesture on Android Chrome */
+  touch-action: pan-y;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-size: cover;
@@ -16,14 +27,16 @@ body {
 
 #app, .app-container {
   max-width: var(--app-max-width);
-  min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
   position: relative;
   background: transparent;
-  /* Do NOT use overflow-x:hidden here — on Android Chrome, any overflow value
-     other than visible on a positioned ancestor kills vertical touch scrolling.
-     Horizontal overflow is prevented by max-width + width:100% on children. */
+  /* overflow MUST remain visible — any non-visible overflow on a positioned
+     ancestor creates a new scroll container and breaks Android Chrome
+     touch-scroll on the document. */
+  overflow: visible;
+  /* Allow native pan gesture to propagate to the document scroll layer */
+  touch-action: pan-y;
 }
 
 /* ── Page Wrapper ── */
@@ -54,21 +67,31 @@ body.has-bg {
   --glass-bg:     rgba(8, 5, 26, 0.68);
 }
 
-body.has-bg #app::before,
-body.has-bg .app-container::before {
-  opacity: 1;
-}
-
-/* Dim overlay over bg image */
-#app::before, .app-container::before {
+/* Dim overlay over bg image — use body::before, NOT #app::before.
+   A fixed-positioned pseudo-element on #app creates a new compositing
+   layer that intercepts touch hit-testing on Android Chrome, breaking
+   vertical scroll. body::before is below all app content and safe. */
+body::before {
   content: '';
   position: fixed;
   inset: 0;
   background: rgba(4, 2, 15, 0.55);
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+body.has-bg::before {
+  opacity: 1;
+}
+
+/* Remove the old #app::before / .app-container::before overlay entirely.
+   Any fixed overlay on a positioned ancestor of scrollable content
+   breaks Android Chrome touch-scroll. */
+#app::before, .app-container::before {
+  display: none;
+  content: none;
 }
 
 /* ── Glass Card ── */
@@ -206,10 +229,15 @@ body.has-bg .app-container::before {
 .topbar {
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Center within app-max-width without transform.
+     transform on fixed elements creates a new stacking context
+     which contributes to compositing layer issues on Android Chrome. */
+  left: 0;
+  right: 0;
   width: 100%;
   max-width: var(--app-max-width);
+  margin-left: auto;
+  margin-right: auto;
   height: var(--topbar-height);
   min-height: var(--topbar-height);
   background: rgba(4, 2, 15, 0.80);
@@ -222,6 +250,17 @@ body.has-bg .app-container::before {
   padding: 0 var(--space-5);
   z-index: var(--z-sticky);
   box-sizing: border-box;
+}
+
+/* On viewports wider than app-max-width, position the topbar
+   correctly aligned with the #app container */
+@media (min-width: 430px) {
+  .topbar {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    margin: 0;
+  }
 }
 
 .topbar-title {

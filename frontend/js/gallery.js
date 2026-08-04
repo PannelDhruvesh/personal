@@ -52,7 +52,7 @@ async function loadFiles(reset = false) {
     if (currentFilter === 'videos') params.file_type = 'video';
     if (currentFilter === 'favorites') params.favorites_only = true;
 
-    const res = await api.getGallery(params);
+    const res = await api.getGallery(params, currentAbort.signal);
     const { data: files, pagination } = res;
 
     if (reset) grid.innerHTML = '';
@@ -117,7 +117,7 @@ function createMediaItem(file) {
   if (file.is_favorite) {
     const fav = document.createElement('span');
     fav.className = 'media-fav-icon';
-    fav.textContent = '♥';
+    fav.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
     div.appendChild(fav);
   }
 

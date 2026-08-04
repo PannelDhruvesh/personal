@@ -36,8 +36,22 @@ function renderProfile(u) {
 
   if (avatarEl) {
     if (u.avatar_url) {
-      avatarEl.innerHTML = `<img src="${u.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      // Use DOM creation — never innerHTML with user-supplied URL
+      const img = document.createElement('img');
+      img.src = u.avatar_url;
+      img.alt = 'avatar';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      // Handle stale signed URL (401/403/404) — re-fetch fresh profile
+      img.addEventListener('error', async () => {
+        const fresh = await loadProfile();
+        if (fresh?.avatar_url && fresh.avatar_url !== u.avatar_url) {
+          renderProfile(fresh);
+        }
+      }, { once: true });
+      avatarEl.innerHTML = '';
+      avatarEl.appendChild(img);
     } else {
+      avatarEl.innerHTML = '';
       avatarEl.style.background = 'var(--gradient-primary)';
       avatarEl.style.display = 'flex';
       avatarEl.style.alignItems = 'center';

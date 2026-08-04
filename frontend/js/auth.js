@@ -99,6 +99,7 @@ export async function logout() {
 
 /**
  * Fetch fresh user profile and cache it.
+ * Always call this after login to get a fresh signed avatar URL.
  */
 export async function refreshUserProfile() {
   try {
@@ -109,4 +110,20 @@ export async function refreshUserProfile() {
     }
   } catch (_) {}
   return null;
+}
+
+/**
+ * Refresh the avatar URL for a user object if the stored URL has expired.
+ * Call this whenever rendering an avatar from localStorage cache.
+ * Returns a promise that resolves with the fresh user data (or null on failure).
+ */
+export async function refreshAvatarIfNeeded(user) {
+  if (!user?.avatar_url) return user;
+  // If avatar_url looks like a signed Supabase URL that might have expired,
+  // fetch fresh profile data. Signed URLs contain 'token=' in the query string.
+  const isSignedUrl = user.avatar_url.includes('token=') || user.avatar_url.includes('supabase');
+  if (isSignedUrl) {
+    return await refreshUserProfile();
+  }
+  return user;
 }

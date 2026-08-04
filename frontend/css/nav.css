@@ -5,10 +5,14 @@
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   width: 100%;
   max-width: var(--app-max-width);
+  /* Center without transform on mobile widths to avoid
+     compositing layer issues on Android Chrome */
+  margin-left: auto;
+  margin-right: auto;
   height: calc(var(--navbar-height) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
   background: rgba(8, 5, 26, 0.94);
@@ -19,6 +23,16 @@
   align-items: center;
   justify-content: space-around;
   z-index: var(--z-navbar);
+}
+
+/* On viewports wider than app-max-width, centre with transform */
+@media (min-width: 430px) {
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    margin: 0;
+  }
 }
 
 /* ── Nav Item ── */

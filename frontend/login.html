@@ -167,7 +167,13 @@
         const { api } = await import('./js/api.js');
         const res = await api.googleLogin(credentialResponse.credential);
         api.setTokens(res.data.access_token, res.data.refresh_token);
+        // Store initial user from google response
         localStorage.setItem('user', JSON.stringify(res.data.user));
+        // Fetch fresh profile to get current signed avatar URL
+        try {
+          const freshRes = await api.getMe();
+          if (freshRes?.data) localStorage.setItem('user', JSON.stringify(freshRes.data));
+        } catch (_) { /* non-fatal */ }
         window.location.replace('/dashboard.html');
       } catch(e) {
         showMsg(e.message || 'Google sign-in failed. Try email/password.', 'error');

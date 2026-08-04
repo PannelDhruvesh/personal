@@ -104,10 +104,11 @@ async def delete_file(
         raise HTTPException(status_code=404, detail="File not found")
 
     if permanent:
-        file_size = file.file_size or 0
         await delete_file_from_storage(file.storage_path)
         db.delete(file)
-        current_user.storage_used = max(0, (current_user.storage_used or 0) - file_size)
+        # NOTE: Do NOT manually update storage_used here.
+        # The database trigger on_file_storage_change (DELETE on files)
+        # decrements users.storage_used atomically.
         db.commit()
         _log_activity(db, current_user.id, "delete_permanent", "file", file_id,
                       {"filename": file.original_filename})

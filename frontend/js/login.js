@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { redirectIfAuth } from './auth.js';
+import { redirectIfAuth, setUser } from './auth.js';
 import { toast } from './toast.js';
 
 redirectIfAuth();
@@ -15,14 +15,14 @@ const formMsg = document.getElementById('form-message');
 togglePwd?.addEventListener('click', () => {
   const isText = passwordInput.type === 'text';
   passwordInput.type = isText ? 'password' : 'text';
-  togglePwd.textContent = isText ? '👁️' : '🙈';
+  togglePwd.textContent = isText ? 'SHOW' : 'HIDE';
 });
 
 function setLoading(loading) {
   submitBtn.disabled = loading;
   submitBtn.innerHTML = loading
-    ? '<span class="animate-spin" style="display:inline-block">⏳</span> Signing in...'
-    : '✨ Sign In';
+    ? '<span class="animate-spin" style="display:inline-block">&#8987;</span> Signing in...'
+    : 'Sign In';
 }
 
 function showMessage(msg, type = 'error') {
@@ -52,8 +52,17 @@ form?.addEventListener('submit', async (e) => {
     const res = await api.login({ email, password });
     const { access_token, refresh_token, user } = res.data;
 
+    // Store tokens first
     api.setTokens(access_token, refresh_token);
-    localStorage.setItem('user', JSON.stringify(user));
+    // Store initial user from login response (may have stale/signed avatar)
+    setUser(user);
+
+    // Fetch fresh profile immediately — gets a fresh signed avatar URL
+    // and up-to-date user data (storage, verified status etc.)
+    try {
+      const freshRes = await api.getMe();
+      if (freshRes?.data) setUser(freshRes.data);
+    } catch (_) { /* non-fatal — proceed with login-response user */ }
 
     toast.love('Welcome back ❤️');
     setTimeout(() => window.location.replace('/dashboard.html'), 600);

@@ -44,24 +44,20 @@ async function loadFile() {
 function render() {
   if (!file) return;
 
-  // Sanitize and safely set text content
   if (titleEl) titleEl.textContent = file.original_filename || 'Untitled';
   if (sizeEl)  sizeEl.textContent  = formatBytes(file.file_size);
   if (dateEl)  dateEl.textContent  = timeAgo(file.created_at);
-  if (favBtn)  favBtn.textContent  = file.is_favorite ? '❤️' : '🤍';
+
+  // Update SVG fav icon (outline vs filled) — no emoji
+  _updateFavIcon(file.is_favorite);
 
   if (mediaContainer) {
-    // Clear previous content
     mediaContainer.innerHTML = '';
-    
     if (file.file_type === 'photo') {
       const img = document.createElement('img');
       img.id = 'viewer-img';
-      // Sanitize URL - only use if it's a valid URL
       const safeUrl = String(file.signed_url || '').trim();
-      if (safeUrl) {
-        img.setAttribute('src', safeUrl);
-      }
+      if (safeUrl) img.setAttribute('src', safeUrl);
       img.setAttribute('alt', '');
       img.setAttribute('draggable', 'false');
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;user-select:none;';
@@ -71,9 +67,7 @@ function render() {
       const video = document.createElement('video');
       video.id = 'viewer-video';
       const safeUrl = String(file.signed_url || '').trim();
-      if (safeUrl) {
-        video.setAttribute('src', safeUrl);
-      }
+      if (safeUrl) video.setAttribute('src', safeUrl);
       video.setAttribute('controls', '');
       video.setAttribute('playsinline', '');
       video.setAttribute('autoplay', '');
@@ -81,6 +75,13 @@ function render() {
       mediaContainer.appendChild(video);
     }
   }
+}
+
+function _updateFavIcon(isFav) {
+  const outline = document.getElementById('fav-icon-outline');
+  const filled  = document.getElementById('fav-icon-filled');
+  if (outline) outline.style.display = isFav ? 'none' : 'block';
+  if (filled)  filled.style.display  = isFav ? 'block' : 'none';
 }
 
 // ── Pinch to zoom ──
@@ -123,8 +124,8 @@ favBtn?.addEventListener('click', async () => {
   try {
     const res = await api.favoriteFile(fileId);
     file.is_favorite = res.data.is_favorite;
-    favBtn.textContent = file.is_favorite ? '❤️' : '🤍';
-    toast.love(file.is_favorite ? 'Added to favorites ❤️' : 'Removed from favorites');
+    _updateFavIcon(file.is_favorite);
+    toast.love(file.is_favorite ? 'Added to favorites' : 'Removed from favorites');
   } catch (_) { toast.error('Failed'); }
 });
 

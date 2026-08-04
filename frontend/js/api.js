@@ -61,19 +61,22 @@ class ApiClient {
       headers['Content-Type'] = 'application/json';
     }
 
+    // Preserve any AbortSignal passed by caller
+    const signal = options.signal || null;
+
     // Show wake-up indicator on first request if server might be sleeping
     const wakeEl = document.getElementById('server-wake-toast');
 
     let response;
     try {
-      response = await fetch(url, { ...options, headers });
+      response = await fetch(url, { ...options, headers, signal });
     } catch (networkErr) {
       // Skip retry for intentional aborts
       if (networkErr.name === 'AbortError') throw networkErr;
       // Likely Render cold start — retry once after delay
       if (wakeEl) { wakeEl.style.display = 'flex'; }
       await new Promise(r => setTimeout(r, 3000));
-      response = await fetch(url, { ...options, headers });
+      response = await fetch(url, { ...options, headers, signal });
       if (wakeEl) { wakeEl.style.display = 'none'; }
     }
 
@@ -91,7 +94,7 @@ class ApiClient {
         headers['Authorization'] = `Bearer ${newToken}`;
         this._refreshQueue.forEach(r => r());
         this._refreshQueue = [];
-        response = await fetch(url, { ...options, headers });
+        response = await fetch(url, { ...options, headers, signal });
       } finally {
         this._refreshing = false;
       }
@@ -133,9 +136,9 @@ class ApiClient {
     return data;
   }
 
-  get(endpoint, params = {}) {
+  get(endpoint, params = {}, signal = null) {
     const query = new URLSearchParams(params).toString();
-    return this.request(`${endpoint}${query ? '?' + query : ''}`, { method: 'GET' });
+    return this.request(`${endpoint}${query ? '?' + query : ''}`, { method: 'GET', signal });
   }
 
   post(endpoint, body = {}) {
@@ -187,9 +190,9 @@ class ApiClient {
   getAlbumTrash(params)    { return this.get('/albums/trash', params); }
 
   // ── Gallery ──
-  getGallery(params)       { return this.get('/gallery/', params); }
+  getGallery(params, signal)       { return this.get('/gallery/', params, signal); }
   getRecent(limit)         { return this.get('/gallery/recent', { limit }); }
-  searchFiles(q, params)   { return this.get('/gallery/search', { q, ...params }); }
+  searchFiles(q, params, signal)   { return this.get('/gallery/search', { q, ...params }, signal); }
   getTrash(params)         { return this.get('/gallery/trash', params); }
 
   // ── Uploads ──

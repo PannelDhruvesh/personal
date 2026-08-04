@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -89,6 +90,25 @@ async def add_security_headers(request: Request, call_next):
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     return JSONResponse(status_code=404, content={"success": False, "message": "Resource not found"})
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    """Convert FastAPI 422 validation errors (e.g. malformed UUID path params) to clean 400 responses."""
+    errors = exc.errors()
+    # Check if any error is a UUID parse failure
+    for error in errors:
+        if error.get("type") in ("uuid_parsing", "value_error") and "uuid" in str(error).lower():
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "message": "Invalid ID format — must be a valid UUID"}
+            )
+    # Generic validation error
+    first_msg = errors[0].get("msg", "Validation error") if errors else "Validation error"
+    return JSONResponse(
+        status_code=400,
+        content={"success": False, "message": first_msg}
+    )
 
 
 @app.exception_handler(500)

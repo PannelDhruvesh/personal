@@ -136,7 +136,7 @@ def generate_signed_download_url(storage_path: str, expires_in: int = 300) -> Op
 
 async def upload_file_to_storage(file_content: bytes, storage_path: str, content_type: str) -> str:
     """Upload file to Supabase Storage."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     await loop.run_in_executor(
         None,
         lambda: supabase_client.storage.from_(settings.SUPABASE_BUCKET).upload(
@@ -151,7 +151,7 @@ async def upload_file_to_storage(file_content: bytes, storage_path: str, content
 async def delete_file_from_storage(storage_path: str) -> bool:
     """Delete a file from Supabase Storage."""
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(
             None,
             lambda: supabase_client.storage.from_(settings.SUPABASE_BUCKET).remove([storage_path])
@@ -171,7 +171,7 @@ async def delete_files_from_storage_batch(paths: List[str]) -> None:
     if not paths:
         return
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(
             None,
             lambda: supabase_client.storage.from_(settings.SUPABASE_BUCKET).remove(paths)
@@ -187,7 +187,7 @@ async def delete_files_from_storage_batch(paths: List[str]) -> None:
 async def get_file_bytes(storage_path: str) -> Optional[bytes]:
     """Download file bytes from storage."""
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(
             None,
             lambda: supabase_client.storage.from_(settings.SUPABASE_BUCKET).download(storage_path)

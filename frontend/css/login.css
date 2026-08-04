@@ -225,13 +225,16 @@
 /* ── OTP ── */
 .otp-inputs {
   display: flex;
-  gap: var(--space-3);
+  gap: clamp(6px, 2vw, 12px);
   justify-content: center;
   margin: var(--space-4) 0;
 }
 
 .otp-input {
-  width: 52px; height: 60px;
+  /* Responsive size: fits 6 inputs within 300px card padding on 320px screens */
+  width: clamp(38px, calc((100% - 5 * clamp(6px, 2vw, 12px)) / 6), 52px);
+  min-width: 36px;
+  height: clamp(50px, 10vw, 60px);
   text-align: center;
   font-size: var(--text-xl);
   font-weight: 700;
@@ -241,6 +244,8 @@
   color: var(--dark-text);
   transition: var(--transition-base);
   -webkit-appearance: none;
+  flex: 1;
+  max-width: 52px;
 }
 .otp-input:focus {
   border-color: var(--purple-400);

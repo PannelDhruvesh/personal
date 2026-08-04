@@ -190,5 +190,5 @@ REVOKE EXECUTE ON FUNCTION public.rls_auto_enable() FROM authenticated;
 -- SELECT proname, prosecdef, proconfig FROM pg_proc
 --   WHERE pronamespace = 'public'::regnamespace
 --   AND proname IN ('update_updated_at_column','create_user_settings',
---                   'update_album_stats','update_user_storage','clean_expired_otps');
+--   'update_album_stats','update_user_storage','clean_expired_otps');
 -- Expected: prosecdef = false, proconfig contains search_path=public

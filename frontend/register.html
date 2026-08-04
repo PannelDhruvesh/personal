@@ -88,7 +88,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
-              ✨ Create Account
+              Create Account
             </button>
 
           </form>
@@ -125,7 +125,7 @@
             <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
           </div>
 
-          <button class="btn btn-primary btn-full" id="verify-btn">✅ Verify</button>
+          <button class="btn btn-primary btn-full" id="verify-btn">Verify</button>
 
           <div class="auth-footer" style="margin-top:16px;">
             Didn't receive it?
@@ -176,13 +176,20 @@
       google.accounts.id.initialize({
         client_id: clientId,
         callback: function(resp) {
+          var apiModule;
           import('./js/api.js').then(function(m) {
+            apiModule = m;
             return m.api.googleLogin(resp.credential);
           }).then(function(res) {
             var a = res.data;
             localStorage.setItem('access_token', a.access_token);
             localStorage.setItem('refresh_token', a.refresh_token);
             localStorage.setItem('user', JSON.stringify(a.user));
+            // Fetch fresh profile to get current signed avatar URL
+            return apiModule.api.getMe().then(function(fresh) {
+              if (fresh && fresh.data) localStorage.setItem('user', JSON.stringify(fresh.data));
+            }).catch(function() {});
+          }).then(function() {
             window.location.replace('/dashboard.html');
           }).catch(function(e) {
             alert('Google sign-in failed: ' + (e.message || e));
