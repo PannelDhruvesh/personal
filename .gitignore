@@ -1,5 +1,5 @@
 # Python
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *.pyo
 *.pyd
@@ -31,7 +31,7 @@ Thumbs.db
 *.log
 logs/
 
-# Node (if any tooling)
+# Node
 node_modules/
 
 # Uploads temp
@@ -39,3 +39,7 @@ backend/storage/temp/
 
 # Docker
 *.override.yml
+
+# Local dev
+nginx.conf
+requirements.txt
