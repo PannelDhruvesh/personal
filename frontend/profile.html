@@ -25,37 +25,55 @@
 
     <main style="padding-bottom:calc(var(--navbar-height) + var(--safe-bottom) + 16px);">
 
-      <!-- Cover + Avatar -->
-      <div class="profile-cover">
-        <div style="position:absolute;top:16px;right:16px;padding-top:env(safe-area-inset-top,0);">
-          <a href="/settings.html" style="width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);" aria-label="Settings">
+      <!-- ── Banner / Cover ── -->
+      <div class="profile-cover" id="profile-cover">
+        <!-- Banner image injected by JS -->
+
+        <!-- Settings button (top-right) -->
+        <div class="profile-cover-actions">
+          <a href="/settings.html" class="profile-cover-btn" aria-label="Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity="0.9"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           </a>
         </div>
       </div>
 
-      <div style="position:relative;padding:0 20px;">
+      <!-- ── Avatar row ── -->
+      <div class="profile-avatar-row">
         <div class="profile-avatar-wrap">
-          <div id="profile-avatar" class="profile-avatar" style="display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white;background:var(--gradient-primary);"></div>
-          <label class="profile-avatar-edit" for="avatar-input" title="Change photo" style="font-size:16px;color:white;font-weight:700;">+</label>
-          <input type="file" id="avatar-input" accept="image/*" style="display:none;" />
+          <!-- Main profile photo -->
+          <div id="profile-avatar"
+               class="profile-avatar"
+               style="display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white;background:var(--gradient-primary);"
+               aria-label="Profile photo">
+          </div>
+          <!-- Edit button triggers file input -->
+          <label class="profile-avatar-edit"
+                 for="avatar-input"
+                 title="Change profile photo"
+                 aria-label="Change profile photo">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </label>
+          <input type="file" id="avatar-input" accept="image/*" style="display:none;" aria-label="Upload profile photo" />
         </div>
-        <div style="margin-top:52px;display:flex;justify-content:flex-end;">
-          <button class="btn btn-secondary" id="edit-profile-btn" style="padding:10px 20px;font-size:13px;">Edit Profile</button>
-        </div>
+
+        <!-- Edit Profile button -->
+        <button class="btn btn-secondary profile-edit-btn" id="edit-profile-btn" aria-label="Edit profile">
+          Edit Profile
+        </button>
       </div>
 
+      <!-- ── Profile info ── -->
       <div class="profile-info">
-        <h1 class="profile-name" id="profile-name">Loading...</h1>
+        <h1 class="profile-name" id="profile-name">Loading…</h1>
         <p class="profile-username" id="profile-username">@username</p>
         <p class="profile-bio" id="profile-bio"></p>
-        <p style="font-size:12px;color:var(--dark-subtext);margin-top:8px;display:flex;align-items:center;gap:4px;">
+        <p class="profile-email-row">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v1.5l8 5 8-5V6H4zm0 3.5V18h16V9.5l-8 5-8-5z"/></svg>
           <span id="profile-storage">—</span>
         </p>
       </div>
 
-      <!-- Stats -->
+      <!-- ── Stats ── -->
       <div class="profile-stats">
         <div class="profile-stat">
           <div class="profile-stat-value" id="stat-photos">—</div>
@@ -71,7 +89,7 @@
         </div>
       </div>
 
-      <!-- Media section -->
+      <!-- ── Media menu ── -->
       <p class="menu-section-title">Media</p>
       <div class="menu-list">
         <a href="/gallery.html" class="menu-item">
@@ -97,7 +115,7 @@
         </a>
       </div>
 
-      <!-- Account section -->
+      <!-- ── Account menu ── -->
       <p class="menu-section-title">Account</p>
       <div class="menu-list">
         <a href="/settings.html" class="menu-item">
@@ -117,7 +135,7 @@
           </div>
           <span class="menu-item-arrow">›</span>
         </a>
-        <div class="menu-item" id="logout-btn" style="cursor:pointer;">
+        <div class="menu-item" id="logout-btn" style="cursor:pointer;" role="button" tabindex="0" aria-label="Sign out">
           <div class="menu-item-icon red">
             <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
           </div>
@@ -128,7 +146,7 @@
 
     </main>
 
-    <!-- Bottom Nav -->
+    <!-- ── Bottom Nav ── -->
     <nav class="bottom-nav">
       <a href="/dashboard.html" class="nav-item" aria-label="Home">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
@@ -142,7 +160,7 @@
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
       </a>
       <a href="/gallery.html" class="nav-item" aria-label="Gallery">
-        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2zM5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15l-5-5L11 15l-4-4-4 4V5h18v10zM3 19h18v2H3v-2z"/></svg></span>
         <span class="nav-label">Gallery</span>
       </a>
       <a href="/profile.html" class="nav-item active" aria-label="Profile">
@@ -151,19 +169,82 @@
       </a>
     </nav>
 
-    <!-- Edit Profile Modal -->
-    <div id="edit-profile-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
-      <div style="width:100%;max-width:430px;background:var(--dark-surface);border-radius:28px 28px 0 0;padding:24px 20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0));border-top:1px solid var(--dark-border);">
-        <div style="width:40px;height:4px;background:var(--dark-border);border-radius:2px;margin:0 auto 20px;"></div>
-        <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">Edit Profile</h3>
-        <form id="edit-profile-form" style="display:flex;flex-direction:column;gap:16px;">
+    <!-- ═══════════════════════════════════════════
+         Edit Profile Modal (bottom sheet)
+         ═══════════════════════════════════════════ -->
+    <div id="edit-profile-modal"
+         class="modal-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-label="Edit profile"
+         style="display:none;">
+
+      <div class="modal-sheet">
+        <!-- Drag handle -->
+        <div class="modal-handle" aria-hidden="true"></div>
+
+        <h3 class="modal-title">Edit Profile</h3>
+
+        <!-- ── PROFILE PHOTO section ── -->
+        <div class="edit-section">
+          <p class="edit-section-label">Profile Photo</p>
+          <div class="edit-photo-row">
+            <!-- Current avatar preview -->
+            <div id="edit-modal-avatar"
+                 class="edit-modal-avatar"
+                 aria-label="Current profile photo"
+                 style="background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;">
+            </div>
+            <div class="edit-photo-actions">
+              <button id="edit-change-photo-btn"
+                      class="btn btn-secondary edit-action-btn"
+                      aria-label="Change profile photo"
+                      type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Change Photo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── BANNER section ── -->
+        <div class="edit-section">
+          <p class="edit-section-label">Banner</p>
+          <div class="edit-banner-preview" id="edit-modal-banner" aria-label="Current banner">
+            <span class="edit-banner-placeholder" aria-hidden="true">No banner</span>
+          </div>
+          <button id="edit-change-banner-btn"
+                  class="btn btn-secondary edit-action-btn"
+                  aria-label="Change banner photo"
+                  type="button"
+                  style="width:100%;margin-top:10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-5-7l-3 3.72L11 13l-3 4h12l-4-4z"/></svg>
+            Change Banner
+          </button>
+        </div>
+
+        <!-- ── Hidden banner input ── -->
+        <input type="file" id="banner-input" accept="image/*" style="display:none;" aria-label="Upload banner photo" />
+
+        <!-- ── Name / Bio form ── -->
+        <form id="edit-profile-form" style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
           <div class="input-group">
-            <label class="input-label">Display name</label>
-            <input type="text" id="edit-name-input" class="input-field" placeholder="Your name" />
+            <label class="input-label" for="edit-name-input">Display name</label>
+            <input type="text"
+                   id="edit-name-input"
+                   class="input-field"
+                   placeholder="Your name"
+                   maxlength="100"
+                   autocomplete="off" />
           </div>
           <div class="input-group">
-            <label class="input-label">Bio</label>
-            <textarea id="edit-bio-input" class="input-field" rows="3" placeholder="Write something about yourself..." style="resize:none;"></textarea>
+            <label class="input-label" for="edit-bio-input">Bio</label>
+            <textarea id="edit-bio-input"
+                      class="input-field"
+                      rows="3"
+                      placeholder="Write something about yourself…"
+                      maxlength="500"
+                      style="resize:none;"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
           <button type="button" class="btn btn-ghost btn-full" data-close-modal="edit-profile-modal">Cancel</button>
@@ -171,10 +252,13 @@
       </div>
     </div>
 
-  </div>
+  </div><!-- /#app -->
 
   <style>
-    #edit-profile-modal.open { display:flex!important; }
+    @keyframes spin { from { transform:rotate(0) } to { transform:rotate(360deg) } }
+    /* Open state for modals */
+    .modal-overlay.open { display:flex !important; }
+    /* Menu icon fill fix */
     .menu-item-icon svg { width:20px; height:20px; fill:var(--purple-400); }
     .menu-item-icon.red svg { fill:#f87171; }
   </style>

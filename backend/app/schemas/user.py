@@ -11,6 +11,7 @@ class UserResponse(BaseModel):
     username: str
     display_name: Optional[str]
     avatar_url: Optional[str]
+    banner_url: Optional[str]
     bio: Optional[str]
     is_verified: bool
     storage_used: int

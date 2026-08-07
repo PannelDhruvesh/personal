@@ -14,6 +14,7 @@ class User(Base):
     display_name = Column(String(100))
     password_hash = Column(Text, nullable=False)
     avatar_url = Column(Text)
+    banner_url = Column(Text)
     bio = Column(Text)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)

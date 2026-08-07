@@ -17,10 +17,14 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
-    # Generate signed URL for avatar if it's a storage path
+    # Generate signed URLs for avatar and banner if they are storage paths
     avatar_url = current_user.avatar_url
     if avatar_url and not avatar_url.startswith("http"):
         avatar_url = generate_signed_url(avatar_url, expires_in=86400) or avatar_url
+
+    banner_url = current_user.banner_url
+    if banner_url and not banner_url.startswith("http"):
+        banner_url = generate_signed_url(banner_url, expires_in=86400) or banner_url
 
     return success_response(data={
         "id": str(current_user.id),
@@ -28,6 +32,7 @@ def get_me(current_user: User = Depends(get_current_user)):
         "username": current_user.username,
         "display_name": current_user.display_name,
         "avatar_url": avatar_url,
+        "banner_url": banner_url,
         "bio": current_user.bio,
         "is_verified": current_user.is_verified,
         "is_admin": current_user.is_admin,
@@ -74,6 +79,29 @@ async def upload_avatar(
     db.commit()
 
     return success_response(data={"avatar_url": signed_url}, message="Avatar updated")
+
+
+@router.post("/me/banner")
+async def upload_banner(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=415, detail="Only JPEG, PNG, and WebP images are allowed")
+
+    content = await file.read()
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Banner must be under 10MB")
+
+    path = f"{str(current_user.id)}/banners/banner_{uuid.uuid4()}.jpg"
+    await upload_file_to_storage(content, path, file.content_type)
+    signed_url = generate_signed_url(path, expires_in=86400 * 365)
+
+    current_user.banner_url = path
+    db.commit()
+
+    return success_response(data={"banner_url": signed_url}, message="Banner updated")
 
 
 @router.post("/me/change-password")

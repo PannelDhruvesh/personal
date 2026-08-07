@@ -178,6 +178,7 @@ class ApiClient {
   getSettings()            { return this.get('/users/me/settings'); }
   updateSettings(data)     { return this.patch('/users/me/settings', data); }
   uploadAvatar(formData)   { return this.request('/users/me/avatar', { method: 'POST', body: formData }); }
+  uploadBanner(formData)   { return this.request('/users/me/banner', { method: 'POST', body: formData }); }
 
   // ── Albums ──
   getAlbums(params)        { return this.get('/albums/', params); }
