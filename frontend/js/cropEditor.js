@@ -339,7 +339,8 @@ function _loadImage(src) {
   img.onload = () => {
     s.imgNatW = img.naturalWidth;
     s.imgNatH = img.naturalHeight;
-    _measureFrameAndLayout();
+    // Wait one rAF so the overlay is painted and we can read real dimensions
+    requestAnimationFrame(() => _measureFrameAndLayout());
   };
   img.onerror = () => {
     _showError('Could not load image. Please try another file.');
@@ -354,26 +355,33 @@ function _measureFrameAndLayout() {
   const vw = Math.min(window.innerWidth, 430);
   const vh = window.innerHeight;
 
-  // Reserve space for header (~60px) and controls (~136px)
-  const headerH  = 60;
-  const controlH = 136;
-  const available = vh - headerH - controlH;
+  // Measure actual header + controls heights so we never guess wrong
+  const overlay   = s.overlay;
+  const allDivs   = overlay.children;           // [header, viewportWrap, controls]
+  const headerEl  = allDivs[0];
+  const controlEl = allDivs[2];
+  const headerH   = headerEl  ? headerEl.getBoundingClientRect().height  : 60;
+  const controlH  = controlEl ? controlEl.getBoundingClientRect().height : 136;
+  const available = Math.max(vh - headerH - controlH - 16, 100);
 
   let frameW, frameH;
 
   if (s.mode === 'avatar') {
-    // Square crop, comfortable size
-    const size = Math.min(vw - 48, available, 300);
+    const size = Math.min(vw - 48, available, 320);
     frameW = size;
     frameH = size;
   } else {
     // Banner: 16:5 aspect ratio
     frameW = Math.min(vw - 32, 390);
     frameH = Math.round(frameW * (5 / 16));
-    // If height doesn't fit, scale down
-    if (frameH > available - 16) {
-      frameH = available - 16;
+    if (frameH > available - 8) {
+      frameH = available - 8;
       frameW = Math.round(frameH * (16 / 5));
+    }
+    // Clamp to viewport width
+    if (frameW > vw - 32) {
+      frameW = vw - 32;
+      frameH = Math.round(frameW * (5 / 16));
     }
   }
 
@@ -384,50 +392,59 @@ function _measureFrameAndLayout() {
   frame.style.width  = frameW + 'px';
   frame.style.height = frameH + 'px';
 
-  // Compute base image size to cover the frame at scale=1
+  // Cover the frame at scale=1: image must be at least frameW × frameH
   const scaleToFit = Math.max(frameW / s.imgNatW, frameH / s.imgNatH);
-  s.baseW = s.imgNatW * scaleToFit;
-  s.baseH = s.imgNatH * scaleToFit;
+  s.baseW = Math.round(s.imgNatW * scaleToFit);
+  s.baseH = Math.round(s.imgNatH * scaleToFit);
 
   s.img.style.width  = s.baseW + 'px';
   s.img.style.height = s.baseH + 'px';
 
-  // Centre the image
+  // Start perfectly centred, no zoom
   s.offsetX = 0;
   s.offsetY = 0;
   s.scale   = 1;
-
   s.slider.value = '100';
 
   _applyTransform();
 }
 
 // ── Transform ──────────────────────────────────────────────────────────────────
+/**
+ * Positions the image inside the crop frame.
+ *
+ * Strategy: keep transform-origin at "0 0" (top-left) so the maths is simple
+ * and there are no pivot surprises.
+ *
+ *  - At scale=1 the image (baseW × baseH) is centred in the frame.
+ *  - offsetX / offsetY are the user's pan delta on top of that centred position.
+ *  - Scale is applied from the centre of the image so it zooms in-place:
+ *      left = centreLeft - (baseW * scale - baseW) / 2  + offsetX
+ *           = (frameW - baseW*scale) / 2               + offsetX
+ */
 function _applyTransform() {
   const s = _state;
   if (!s || !s.img) return;
 
-  // Image is sized to baseW × baseH at scale=1
-  // Center it in the frame, then apply offset and scale
-  const cx = (s.frameW - s.baseW) / 2 + s.offsetX;
-  const cy = (s.frameH - s.baseH) / 2 + s.offsetY;
+  const left = (s.frameW - s.baseW * s.scale) / 2 + s.offsetX;
+  const top  = (s.frameH - s.baseH * s.scale) / 2 + s.offsetY;
 
-  s.img.style.transform = `translate(${cx}px, ${cy}px) scale(${s.scale})`;
-  s.img.style.left = '0';
-  s.img.style.top  = '0';
+  s.img.style.transformOrigin = '0 0';
+  s.img.style.left      = '0';
+  s.img.style.top       = '0';
+  s.img.style.transform = `translate(${left}px, ${top}px) scale(${s.scale})`;
 }
 
 function _constrainOffset() {
   const s = _state;
   if (!s) return;
 
-  // Scaled dimensions
-  const sw = s.baseW * s.scale;
-  const sh = s.baseH * s.scale;
-
-  // Maximum allowed offset so image always covers the frame
-  const maxX = (sw - s.frameW) / 2;
-  const maxY = (sh - s.frameH) / 2;
+  // With the new transform: left = (frameW - baseW*scale)/2 + offsetX
+  // The image must cover the frame, so:
+  //   left <= 0  →  offsetX <= (baseW*scale - frameW) / 2
+  //   left + baseW*scale >= frameW  →  offsetX >= -(baseW*scale - frameW) / 2
+  const maxX = Math.max((s.baseW * s.scale - s.frameW) / 2, 0);
+  const maxY = Math.max((s.baseH * s.scale - s.frameH) / 2, 0);
 
   s.offsetX = Math.max(-maxX, Math.min(maxX, s.offsetX));
   s.offsetY = Math.max(-maxY, Math.min(maxY, s.offsetY));
@@ -610,44 +627,48 @@ function _exportCrop() {
 
     const img = new Image();
     img.onload = () => {
-      // Map the visible frame region back to natural image coords
-      // At scale s.scale, the rendered size is baseW*scale × baseH*scale
-      // The image's top-left corner in frame coords is:
-      //   imgLeft = (frameW - baseW)/2 + offsetX  (before scale, but scale is from centre)
-      // With transform: translate(cx,cy) scale(scale)
-      // the image top-left in frame px is:
-      //   cx + 0 = (frameW - baseW)/2 + offsetX
-      // but the scale is applied from the element's transform-origin (centre of the element)
-      // Since img is 0,0 with size baseW×baseH:
-      //   actual left = cx + (centre_x - centre_x*scale) ← transform-origin centre
+      /**
+       * New transform:
+       *   left = (frameW - baseW * scale) / 2 + offsetX
+       *   top  = (frameH - baseH * scale) / 2 + offsetY
+       *
+       * Pixel (0,0) in frame space corresponds to:
+       *   imgX = -left  in the scaled-image space
+       *   imgY = -top   in the scaled-image space
+       *
+       * In natural-image space:
+       *   ratio = baseW / imgNatW  (same as baseH / imgNatH)
+       *   srcX = imgX / (scale * ratio)
+       *   srcW = frameW / (scale * ratio)
+       */
+      const ratio  = s.baseW / s.imgNatW;
+      const left   = (s.frameW - s.baseW * s.scale) / 2 + s.offsetX;
+      const top    = (s.frameH - s.baseH * s.scale) / 2 + s.offsetY;
 
-      const cx    = (s.frameW - s.baseW) / 2 + s.offsetX;
-      const cy    = (s.frameH - s.baseH) / 2 + s.offsetY;
-      const imgCx = s.baseW / 2;
-      const imgCy = s.baseH / 2;
+      const srcX = -left  / (s.scale * ratio);
+      const srcY = -top   / (s.scale * ratio);
+      const srcW =  s.frameW / (s.scale * ratio);
+      const srcH =  s.frameH / (s.scale * ratio);
 
-      // Actual top-left of the scaled image in frame coords
-      const scaledLeft = cx + imgCx - imgCx * s.scale;
-      const scaledTop  = cy + imgCy - imgCy * s.scale;
+      // Clamp src rect to image bounds to avoid black edges
+      const clampedSrcX = Math.max(0, srcX);
+      const clampedSrcY = Math.max(0, srcY);
+      const clampedSrcW = Math.min(srcW, s.imgNatW - clampedSrcX);
+      const clampedSrcH = Math.min(srcH, s.imgNatH - clampedSrcY);
 
-      // Frame region in natural-image pixels
-      // scaledLeft is where the scaled image's left edge is in the frame
-      // So frame origin (0,0) maps to:  -scaledLeft / (s.scale * ratio) in natural px
-      const ratio = s.baseW / s.imgNatW; // = baseH/imgNatH
-
-      const srcX = (-scaledLeft) / (s.scale * ratio);
-      const srcY = (-scaledTop)  / (s.scale * ratio);
-      const srcW = s.frameW      / (s.scale * ratio);
-      const srcH = s.frameH      / (s.scale * ratio);
+      // Map clamped source back to dest
+      const dstX = (clampedSrcX - srcX) / srcW * outW;
+      const dstY = (clampedSrcY - srcY) / srcH * outH;
+      const dstW = (clampedSrcW / srcW) * outW;
+      const dstH = (clampedSrcH / srcH) * outH;
 
       if (s.mode === 'avatar') {
-        // Circular clip for avatar
         ctx.beginPath();
         ctx.arc(outW / 2, outH / 2, outW / 2, 0, Math.PI * 2);
         ctx.clip();
       }
 
-      ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, outW, outH);
+      ctx.drawImage(img, clampedSrcX, clampedSrcY, clampedSrcW, clampedSrcH, dstX, dstY, dstW, dstH);
 
       canvas.toBlob(
         blob => blob ? resolve(blob) : reject(new Error('toBlob failed')),
