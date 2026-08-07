@@ -348,13 +348,8 @@
 
     // Enter button → go to dashboard or login
     document.getElementById('enter-btn').addEventListener('click', () => {
-      const btn = document.getElementById('enter-btn');
-      btn.style.transform = 'scale(0.94)';
-      btn.style.opacity = '0.7';
-      setTimeout(() => {
-        const token = localStorage.getItem('access_token');
-        window.location.replace(token ? '/dashboard.html' : '/login.html');
-      }, 180);
+      const token = localStorage.getItem('access_token');
+      window.location.replace(token ? '/dashboard.html' : '/login.html');
     });
   </script>  
 </body> 
