@@ -140,6 +140,36 @@
     .dot:nth-child(2) { animation-delay: 0.2s; }
     .dot:nth-child(3) { animation-delay: 0.4s; }
 
+    /* Enter button */
+    .enter-btn {
+      position: relative;
+      z-index: 2;
+      margin-top: 48px;
+      padding: 16px 56px;
+      background: linear-gradient(135deg, #9b55f5 0%, #5e1ab8 100%);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(124,45,232,0.5);
+      animation: fadeIn 0.6s ease 1s both;
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .enter-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(124,45,232,0.65);
+    }
+
+    .enter-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 20px rgba(124,45,232,0.4);
+    }
+
     @keyframes dotPulse {
       0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
       40% { transform: scale(1); opacity: 1; }
@@ -199,16 +229,14 @@
       <p class="logo-tagline">Your private memory space</p>
     </div>
 
-    <!-- Loading indicator -->
-    <div class="loading-dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
+    <!-- Enter button -->
+    <button class="enter-btn" id="enter-btn" aria-label="Enter Its Billi">
+      Enter ✦
+    </button>
   </div>
 
   <script>
-    // Spawn star particles (no emoji)
+    // Spawn star particles
     const container = document.getElementById('particles');
     for (let i = 0; i < 20; i++) {
       const p = document.createElement('div');
@@ -223,15 +251,15 @@
         animation:particleFloat ${3+Math.random()*5}s linear infinite;
         animation-delay:${Math.random()*4}s;
         opacity:0;
-      `; 
-      container.appendChild(p); 
-    } 
+      `;
+      container.appendChild(p);
+    }
 
-    // Redirect after splash 
-    setTimeout(() => { 
-      const token = localStorage.getItem('access_token'); 
-      window.location.replace(token ? '/dashboard.html' : '/login.html'); 
-    }, 800);  
+    // Enter button → go to dashboard or login
+    document.getElementById('enter-btn').addEventListener('click', () => {
+      const token = localStorage.getItem('access_token');
+      window.location.replace(token ? '/dashboard.html' : '/login.html');
+    });
   </script>  
 </body> 
 </html>    
